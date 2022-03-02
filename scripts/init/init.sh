@@ -375,6 +375,9 @@ root		soft		nproc	1048576
 root		hard		nproc	1048576
 EOF
 fi
+
+sysctl -a
+sysctl -p
 }
 
 
@@ -568,7 +571,8 @@ net.ipv4.ip_local_port_range = 1024    65000
 # net.ipv4.ip_local_port_range = 8000 65535
 EOF
 
-/sbin/sysctl -p
+sysctl -a
+sysctl -p
 }
 
 close_linux_update(){
@@ -698,11 +702,12 @@ config_hostname(){
 	company="your_company_name"
 	project="phala"
 	group_num="groupX"
+	user_name=`whoami`
 
 	ip_num=`ip a  | grep -A5 ": e" | awk '/ inet /{print $2}' | awk -F '[./]' '{print $3"-"$4}' | head -n1`
 	
 	hostnamectl set-hostname "${company}-${project}-${group_num}-${ip_num}"
-	sed -ri '/Default/c '"127.0.1.1\t${company}-${project}-${group_num}-${ip_num}"'' /etc/hosts
+	sed -ri '/'"${user_name}"'|Default/c '"127.0.1.1\t${company}-${project}-${group_num}-${ip_num}"'' /etc/hosts
 }
 
 clear_docker_and_uninstall_pha(){
