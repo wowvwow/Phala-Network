@@ -1,0 +1,24 @@
+# version: "3"
+version: "2"
+services:
+ phala-node:
+   image: ${NODE_IMAGE}
+   container_name: phala-node
+   hostname: phala-node
+   restart: always
+   ports:
+    - "9933:9933"
+    - "9934:9934"
+    - "9615:9615"
+    - "9616:9616"
+    - "9944:9944"
+    - "9945:9945"
+    - "30333:30333"
+    - "30334:30334"
+   environment:
+    - NODE_NAME=${NODE_NAME}
+    - NODE_ROLE=MINER
+      # - "PARACHAIN_EXTRA_ARGS=--state-cache-size 671088640 --db-cache 2048 --max-runtime-instances 16"
+      # - "RELAYCHAIN_EXTRA_ARGS=--state-cache-size 671088640 --db-cache 2048 --max-runtime-instances 16"
+   volumes:
+    - ${NODE_VOLUMES}
