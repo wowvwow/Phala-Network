@@ -603,7 +603,7 @@ EOF
 
 
 install_nvm_and_node(){
-    tar -xf /tmp/nvm.tar.gz -C /opt/
+    tar -xf ./nvm.tar.gz -C /opt/
 if ! grep "配置nvm" /etc/profile ; then
     cat >>/etc/profile <<"EOF"
 
@@ -626,7 +626,7 @@ fi
     # nvm alias default v14.17.5
 
     ln -s /opt/.nvm/versions/node/v16.7.0/bin/node /usr/bin/node
-    rm -rf /tmp/nvm.tar.gz
+    rm -rf ./nvm.tar.gz
 }
 
 update_docker_conf(){
@@ -645,7 +645,7 @@ update_docker_conf(){
     //     "http://hub-mirror.c.163.com",
     //     "https://eiqg0bg0.mirror.aliyuncs.com"
     // ],
-    "registry-mirrors": []
+    "registry-mirrors": [],
 
     "dns": ["114.114.114.114","8.8.8.8","8.8.4.4"],
 
@@ -660,10 +660,10 @@ systemctl restart docker
 }
 
 update_memory_clear(){
-    cp -f /tmp/ReleaseMemory.sh /opt/ReleaseMemory.sh
+    cp -f ./ReleaseMemory.sh /opt/ReleaseMemory.sh
     chmod 755 /opt/ReleaseMemory.sh
     echo "0 */3 * * * bash /opt/ReleaseMemory.sh" >/var/spool/cron/crontabs/root
-    [ -f /tmp/ReleaseMemory.sh ] && rm -rf /tmp/ReleaseMemory.sh
+    [ -f ./ReleaseMemory.sh ] && rm -rf ./ReleaseMemory.sh
 }
 
 config_network(){
@@ -779,5 +779,5 @@ fixed_system_version
 # # 2、上面第1步执行重启后，移除多余内核，还原默认grub配置
 # remove_extra_kernel 
 # default_grub_conf
-rm -rf /tmp/init.sh
+rm -rf ./init.sh
 reboot

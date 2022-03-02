@@ -9,7 +9,6 @@ No cheap. Let's go.
 3. 降低用户使用门槛，扩大phala-network生态圈
 4. 此内容和代码仅适用于ubuntu18.04和ubuntu20.04，建议优先使用ubuntu20.04，卓面版和服务器版均可
 
----
 
 ## 内容列表
 
@@ -46,15 +45,12 @@ No cheap. Let's go.
   - [面板数据监控](#面板数据监控)
 - [参考内容](#参考)
 
----
 
 ## 背景
 
----
 
 ## 了解
 
----
 
 ## 参考
 
@@ -76,7 +72,6 @@ No cheap. Let's go.
 
 [![phala-cluster](png/Phala-cluster.png)]()
 
----
 
 ## 安装
 
@@ -88,7 +83,6 @@ No cheap. Let's go.
 
 2. 单机部署准备工作：
 > ``phala-node机器``：系统ubuntu20.04，cpu6核+，内存16G+，系统盘60-120G，固态数据盘2T+  
-> 
 > ``worker机器``： 系统ubuntu20.04，cpu支持tee隐私计算，内存8G+，系统盘60-120G  
 
 **切记: 系统盘和数据盘分开，可以在后期为你省下很多麻烦和精力**  
@@ -110,7 +104,7 @@ No cheap. Let's go.
 #### 集群部署
 [参考官方文档](https://github.com/Phala-Network/runtime-bridge)  
 [参考其他文档](https://github.com/suugee/phala-prb)
-------------------------------------------------------------------------------------------------------------------
+
 
 ## 维护
 
@@ -148,14 +142,13 @@ No cheap. Let's go.
 
 [prb_post_request](scripts/for_prb_monitor/prb_post_request.py): 该脚本包含 **prb-monitor** 页面对应的数据获取，对应worker的 ``kill`` 、``restart``、``delete``、``edit(update)``等接口，可以根据代码中的示例代码，修改自己对应的 **prb-monitor** 地址和端口，来进行演示，用户可以自行调用或用来作其他的批处理工作
 
-[restart_mis_and_timeout](scripts/for_prb_monitor/restart_mis_and_timeout.py): 打地鼠脚本，该脚本用于 **prb-monitor** 页面中worker出现的 ``BlockNumberMismatch``、``TimeoutError``、 ``Notice: worker unresponsive且Block Height值为-1`` 等异常状态的处理  
-
+[restart_mis_and_timeout](scripts/for_prb_monitor/restart_mis_and_timeout.py): 打地鼠脚本，该脚本用于 **prb-monitor** 页面中worker出现的 ``BlockNumberMismatch``、``TimeoutError``、 ``Notice: worker unresponsive且Block Height值为-1`` 等异常状态的处理，
 该脚本需要配合定时任务执行
 ```shell
 */5 * * * * cd /opt/scripts/for_prb_monitor/; python3 restart_mis_and_timeout.py
 ```
 
----
+
 ## 批处理
 ### 批量添加worker
 [add_work_to_prb_pro](scripts/for_batch_processing/add_worker_to_prb_pro.py): 该脚本用于批量添加worker到 **prb-monitor** 中  
@@ -170,7 +163,7 @@ No cheap. Let's go.
 ### 批量移除worker
 有对应接口代码，批处理方法待开发
 
----
+
 ## 监控
 
 ### 全网数据监控
@@ -180,5 +173,4 @@ No cheap. Let's go.
 ### 面板数据监控
 
 
----
 ## 参考内容
