@@ -24,6 +24,9 @@ No cheap. Let's go.
   - [集群架构](#集群架构)
 - [安装](#安装)
   - [准备](#准备)
+    - [系统安装准备工作](#系统安装准备工作)
+    - [单机部署准备工作](#单机部署准备工作)
+    - [集群部署准备工作](#集群部署准备工作)
   - [部署](#部署)
     - [单机部署](#单机部署)
     - [集群部署](#集群部署)
@@ -78,30 +81,33 @@ No cheap. Let's go.
 ## 安装
 
 ### 准备
+1. 系统安装准备工作
+> 系统安装 ——> [系统初始化](scripts/init) ——> [固态数据盘LVM配置](https://zhuanlan.zhihu.com/p/67166867) ——> 挂载固态数据盘到/opt下面(并**配置开机启动挂载**)
 
-> 单机部署准备工作：
-1. ``phala-node机器``：系统ubuntu20.04，cpu6核+，内存16G+，系统盘60-120G，固态数据盘2T+  
+**以下脚本位置，均放置在/opt目录下，进行操作演示**
+
+2. 单机部署准备工作：
+> ``phala-node机器``：系统ubuntu20.04，cpu6核+，内存16G+，系统盘60-120G，固态数据盘2T+  
+> 
+> ``worker机器``： 系统ubuntu20.04，cpu支持tee隐私计算，内存8G+，系统盘60-120G  
+
+**切记: 系统盘和数据盘分开，可以在后期为你省下很多麻烦和精力**  
+
+
+3. 集群部署准备工作：
+> ``phala-node+prb机器``：系统ubuntu20.04，cpu10核+，内存32G+，系统盘60-120G，固态数据盘2T+  
+> ``worker机器``： 系统ubuntu20.04，cpu支持tee隐私计算，内存8G+，系统盘60-120G
+
 **切记: 系统盘和数据盘分开，可以在后期为你省下很多麻烦和精力**
-2. ``worker机器``： 系统ubuntu20.04，cpu支持tee隐私计算，内存8G+，系统盘60-120G
 
-
-> 集群部署准备工作：
-1. ``phala-node+prb机器``：系统ubuntu20.04，cpu10核+，内存32G+，系统盘60-120G，固态数据盘2T+  
-**切记: 系统盘和数据盘分开，可以在后期为你省下很多麻烦和精力**
-2. ``worker机器``： 系统ubuntu20.04，cpu支持tee隐私计算，内存8G+，系统盘60-120G
-
->> 系统安装 ——> [系统初始化](scripts/init) ——> [固态数据盘LVM配置](https://zhuanlan.zhihu.com/p/67166867) ——> 挂载固态数据盘到/opt下面(并配置开机启动挂载)  
->> 以下脚本位置，均放置在/opt目录下，进行操作演示
 
 ### 部署
 
 #### 单机部署
-
 [参考官方文档](https://github.com/Phala-Network/solo-mining-scripts)  
 [参考其他文档](https://github.com/zozyo/phala-guide/blob/main/node-separation.md)
 
 #### 集群部署
-
 [参考官方文档](https://github.com/Phala-Network/runtime-bridge)  
 [参考其他文档](https://github.com/suugee/phala-prb)
 ------------------------------------------------------------------------------------------------------------------
@@ -113,23 +119,22 @@ No cheap. Let's go.
 - **node高度检测脚本**:
 
 [monitor_phala_node](scripts/for_node/monitor_phala_node.sh): 用来检测node节点高度是否持续性增长，并作出相应告警  
-[dingding](scripts/for_node/dingding.py) : 只支持dingding简单文本告警，同时你需要建立dingding群组，以获取[access_token](https://open.dingtalk.com/document/robots/custom-robot-access)
 
-通过添加定时任务，定时检测高度并自动重启node
-
+[dingding](scripts/for_node/dingding.py) : 只支持dingding简单文本告警，同时你需要建立dingding群组，以获取[access_token](https://open.dingtalk.com/document/robots/custom-robot-access)  
 ```
+# 通过添加定时任务，定时检测高度并自动重启node
 */5 * * * * cd /opt/scripts/for_node/ ; bash monitor_phala_node.sh
 ```
-> 如果你是solo用户，你可以修改``monitor_phala_node.sh``脚本，可以通过调用``ssh``免密 或者 [ansible](http://ansible.com.cn/) 等工具来重启旗下worker机器的 **phala-pherry** ，保持worker机器正常运行   
- 
+> 如果你是solo用户，你可以修改``monitor_phala_node.sh``脚本，可以通过调用``ssh``免密 或者 [ansible](http://ansible.com.cn/) 等工具来重启旗下worker机器的 **phala-pherry** ，保持worker机器正常运行  
+> 
 > 如果你是集群用户，你需要取消``monitor_phala_node.sh``脚本的以下注释，重启 **bridge_fetch_1** ，是为了防止重启node后，prb的同步状态出现-1的情况，先停prb组件，再启动prb组件，防止prb同步数据出现异常
-```shell
-  # 集群用户
-  docker ps -a | grep bridge | awk '{print $1}' | xargs docker stop
-  docker restart phala-node
-  docker ps -a | grep bridge | awk '{print $1}' | xargs docker start
-  docker restart bridge_fetch_1
-```
+> ```shell
+>   # 集群用户
+>   docker ps -a | grep bridge | awk '{print $1}' | xargs docker stop
+>   docker restart phala-node
+>   docker ps -a | grep bridge | awk '{print $1}' | xargs docker start
+>   docker restart bridge_fetch_1
+> ```
 
 - **定期重启prb的生命管理周期程序**
 
@@ -167,8 +172,13 @@ No cheap. Let's go.
 
 ---
 ## 监控
-暂不开放
 
 ### 全网数据监控
+
 ### 本地数据监控
+
 ### 面板数据监控
+
+
+---
+## 参考内容
