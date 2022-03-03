@@ -1,6 +1,6 @@
 # LVM磁盘处理
 
-# ***数据无价，谨慎操作***
+# ***数据无价，谨慎操作，后果自负***
 
 
 ## 内容列表
@@ -63,9 +63,9 @@ sudo apt install -y lvm2
 
 # lsblk
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
-sda      8:0    0  100G  0 disk 
+sda      8:0    0  150G  0 disk 
 ├─sda1   8:1    0   50G  0 part /
-└─sda2   8:5    0   50G  0 part /opt
+└─sda2   8:5    0  100G  0 part /opt
 
 # 进入lvm操作终端，输入help，可以查看更多帮助
 # lvm
@@ -89,7 +89,7 @@ lvm> pvdisplay
   --- NEW Physical volume ---
   PV Name               /dev/sda2
   VG Name               
-  PV Size               50.00 GiB
+  PV Size               100.00 GiB
   Allocatable           NO
   PE Size               0   
   Total PE              0
@@ -121,11 +121,11 @@ lvm> vgdisplay
   Max PV                0
   Cur PV                1
   Act PV                1
-  VG Size               50.00 GiB
+  VG Size               100.00 GiB
   PE Size               4.00 MiB
   Total PE              2559
   Alloc PE / Size       0 / 0   
-  Free  PE / Size       2559 / 50.00 GiB
+  Free  PE / Size       25590 / 100.00 GiB
   VG UUID               brnxX3-XYO5-Ajsr-CkbG-rzeS-7uBq-4yrO9o
 
 
@@ -139,20 +139,20 @@ lvm> vgextend LVM /dev/sda2             #
 
 
 # 创建逻辑卷
-# 以GB为单位创建逻辑卷，如果上面的VG Size 显示为50.00 GiB，可以直接采用，如果显示为 < 50.00 GiB，请采用PE创建逻辑卷
+# 以GB为单位创建逻辑卷，如果上面的VG Size 显示为100.00 GiB，可以直接采用，如果显示为 < 100.00 GiB，请采用PE创建逻辑卷
 # 以PE大小创建逻辑卷
 # 二者采用其一即可，建议根据情况采用，多采用PE大小创建逻辑卷
 
 # 法一：
 # 使用GB为单位创建逻辑卷
 # lvcreate –n [逻辑卷名(自定义)] –L [逻辑卷大小(VG Size对应的指标)] [要创建的 LV 所在的卷组名称(VG name对应名)]
-lvm> lvcreate -n DB_DATA -L 50G LVM
+lvm> lvcreate -n DB_DATA -L 100G LVM
 Logical volume "LVM_DB_DATA" created
 
 # 法二：
 # 使用PE大小创建逻辑卷
 # lvcreate –n [逻辑卷名] –l [物理扩展（PE）大小(上面对应的Free PE / Size对应的指标)] [要创建的 LV 所在的卷组名称]
-lvm> lvcreate -n DB_DATA -l 2559 LVM 
+lvm> lvcreate -n DB_DATA -l 25590 LVM 
   Logical volume "LVM_DB_DATA" created.
 
 # 查看创建的逻辑卷信息，注意核对 LV Path(后期要开机挂载的路径)，LV Name，VG Name，LV Size, Current LE等参数
@@ -166,8 +166,8 @@ lvm> lvdisplay
   LV Creation host, time kali, 2022-03-03 14:46:04 +0800
   LV Status              available
   # open                 0
-  LV Size                <50.00 GiB
-  Current LE             2559
+  LV Size                <100.00 GiB
+  Current LE             25590
   Segments               1
   Allocation             inherit
   Read ahead sectors     auto
@@ -182,16 +182,20 @@ lvm> exit
 
 # 再次查看系统块设备信息，对应的lvm出现，说明/dev/sda2分区已经转换为lvm了，继续往下走
 # lsblk
-sda                   8:16   0   100G  0 disk 
-├─sda1                8:17   0   50G  0 part  /
-└─sda2                8:18   0   50G  0 part 
-  └─LVM-DB_DATA 254:0    0   50G  0 lvm 
+sda                   8:16   0   150G  0 disk 
+├─sda1                8:17   0    50G  0 part  /
+└─sda2                8:18   0   100G  0 part 
+  └─LVM-DB_DATA 254:0    0   100G  0 lvm 
   
+# 如果lsblk查看不到lvm的逻辑卷，可以尝试使用resize2fs命令刷新文件系统，或者重启系统
+# resize2fs /dev/mapper/LVM-DB_DATA
+
   
 # 创建文件系统
 # 在创建有效的文件系统之前，是不能使用逻辑卷的，会无法挂载到其他目录
 # 创建文件系统时，必须指定逻辑卷名位置，否则对应块设备名，不能对应 /dev/sda2 ，否则无法格式化
 # 这里使用 ext4 文件系统，其他文件系统，如 xfs 等，请使用 mkfs -t xfs /dev/mapper/LVM-DB_DATA 命令
+
 # mkfs.ext4 /dev/mapper/LVM-DB_DATA
 mke2fs 1.46.4 (18-Aug-2021)
 Creating filesystem with 2620416 4k blocks and 655360 inodes
@@ -214,7 +218,7 @@ Writing superblocks and filesystem accounting information: done
 
 # 查看挂载的lvm卷
 # df -hT 
-/dev/mapper/LVM-DB_DATA ext4      9.8G   24K  9.3G   1% /opt
+/dev/mapper/LVM-DB_DATA ext4      99.8G   24K  99.3G   1% /opt
 
 
 # 至此，完成整个lvm的创建过程
@@ -223,5 +227,159 @@ Writing superblocks and filesystem accounting information: done
 [国内相关文档](https://linux.cn/article-12670-1.html)  
 [国外相关文档](https://www.2daygeek.com/create-lvm-storage-logical-volume-manager-in-linux/)
 
-
 - #### 单独磁盘创建LVM 
+单独磁盘创建lvm，其实和单独分区创建lvm，没有什么区别，按照上面的步骤，将``/dev/sda2`` 换成你的块设备名，通过 ``lsblk`` 查看系统新加入的磁盘  
+> 如：新增了一块SATA盘：``/dev/sdb`` , 将``/dev/sda2`` 换成 ``/dev/sdb``，进行操作  
+> 如：新增了一块固态盘：``/dev/nvme0n1`` , 将``/dev/sda2`` 换成 ``/dev/nvme0n1``，进行操作
+
+
+- ### LVM扩容
+如果系统中，没有进行过任何块设备的lvm转换，同时新增了一块磁盘作为专用数据存储，有将其转换为lvm的需求，请参考上面 [单独磁盘创建LVM](#单独磁盘创建LVM) 步骤来进行  
+
+如果系统中，已经存在了块设备的lvm转换，新增一块磁盘，但是又作为不同的数据存储，想区分已经存在的``lvm``，可以设置不同的卷组，请参考上面 [单独磁盘创建LVM](#单独分区创建LVM) 步骤，请设置不同的``VG卷组名`` 和 ``逻辑卷名``，来区分已经存在的``VG卷组`` 和 ``逻辑卷名``，来达到不同的专用数据存储目录，方便后期数据动态扩容磁盘
+
+如果系统中，已经存在了块设备的lvm转换，但是该lvm对应的``VG卷组名``下的``逻辑卷``不够用了，新增一块磁盘，来进行动态扩容，请参考以下步骤：  
+如：我们将给上面的/dev/sda2对应的``VG卷组``中的``逻辑卷``进行扩容，新增一块100G大小的磁盘/dev/sdb，来进行演示
+```shell
+# 查看系统新增的块设备信息
+# lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+sda      8:0    0  150G  0 disk 
+├─sda1   8:1    0   50G  0 part /
+└─sda2   8:5    0  100G  0 part /opt
+sdb      8:16   0  100G  0 disk
+
+# 进入lvm
+# lvm
+
+# 创建PV
+# 该命令，会格式化/dev/sdb磁盘，请核对好块设备对应磁盘名，但不会影响/dev/sda2对应的逻辑卷里面的数据，从而来实现不停机，不停服务，给逻辑卷的动态扩容
+lvm> pvcreate /dev/sdb
+  Physical volume "/dev/sdb" successfully created.
+# 查看PV信息  
+lvm> pvdisplay /dev/sdb
+  "/dev/sdb" is a new physical volume of "100.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/sdb
+  VG Name               
+  PV Size               100.00 GiB
+  Allocatable           NO
+  PE Size               0   
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               MwEbyg-Pj3o-xHfo-6Ri6-fQv7-eDIf-meYP2H
+  
+# 扩展卷组，LVM 对应之前定义的卷组名VG Name
+lvm> vgextend LVM /dev/sdb
+  Volume group "LVM" successfully extended
+# 查看扩展卷组信息
+lvm> vgdisplay
+  --- Volume group ---
+  VG Name               LVM
+  System ID             
+  Format                lvm2
+  Metadata Areas        2
+  Metadata Sequence No  3
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                1
+  Open LV               0
+  Max PV                0
+  Cur PV                2
+  Act PV                2
+  VG Size               199.99 GiB
+  PE Size               4.00 MiB
+  Total PE              51180
+  Alloc PE / Size       25590 / <100.00 GiB
+  Free  PE / Size       25590 / <100.00 GiB
+  VG UUID               HwURLY-JDrg-il1S-YRD3-WrVo-suly-zoHHVO
+  
+# 扩展逻辑卷
+# 先查看当前存在的逻辑卷信息
+lvm> lvdisplay
+  --- Logical volume ---
+  LV Path                /dev/LVM/DB_DATA
+  LV Name                DB_DATA
+  VG Name                LVM
+  LV UUID                oVBdGa-UtWj-jxwT-tIIA-eIDH-2hBD-SNLevv
+  LV Write Access        read/write
+  LV Creation host, time kali, 2022-03-03 15:07:34 +0800
+  LV Status              available
+  # open                 0
+  LV Size                <100.00 GiB
+  Current LE             25590
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           254:0
+  
+# 再扩展逻辑卷，这里采用PE大小，下面的25590，从vgdisplay中的 Free  PE / Size 获取
+lvm> lvextend -l +25590 /dev/LVM/DB_DATA
+  Size of logical volume LVM/DB_DATA changed from <100.00 GiB (25590 extents) to 199.99 GiB (51180 extents).
+  Logical volume LVM/DB_DATA successfully resized.
+  
+# 再次查看 PV 信息，/dev/sda2和/dev/sdb已经同属于一个VG Name下面
+lvm> pvdisplay 
+  --- Physical volume ---
+  PV Name               /dev/sda2
+  VG Name               LVM
+  PV Size               <100.00 GiB / not usable 2.98 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              25590
+  Free PE               0
+  Allocated PE          25590
+  PV UUID               9wsi1p-oZB6-cdm8-xQWA-NZEf-RabT-dimpiz
+   
+  --- Physical volume ---
+  PV Name               /dev/sdb
+  VG Name               LVM
+  PV Size               100.00 GiB / not usable 4.00 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              25590
+  Free PE               0
+  Allocated PE          25590
+  PV UUID               MwEbyg-Pj3o-xHfo-6Ri6-fQv7-eDIf-meYP2H
+
+# 再次查看 LV 信息，/dev/LVM/DB_DATA 逻辑卷已经扩容到199.99GB，就是我们要从100G扩容到了200G
+lvm> lvdisplay 
+  --- Logical volume ---
+  LV Path                /dev/LVM/DB_DATA
+  LV Name                DB_DATA
+  VG Name                LVM
+  LV UUID                oVBdGa-UtWj-jxwT-tIIA-eIDH-2hBD-SNLevv
+  LV Write Access        read/write
+  LV Creation host, time kali, 2022-03-03 15:07:34 +0800
+  LV Status              available
+  # open                 0
+  LV Size                199.99 GiB
+  Current LE             51180
+  Segments               2
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           254:0
+
+# 完成逻辑卷扩容，退出exit
+lvm> exit
+
+# 再次查看块设备信息
+# lsblk
+sda               8:0    0    150G  0 disk 
+├─sda1            8:1    0     50G  0 part /
+└──sda2            8:2   0    100G  0 part 
+   └─LVM-DB_DATA 254:0   0    100G  0 lvm  /opt
+sdb               8:16   0    100G  0 disk 
+└─LVM-DB_DATA 253:0      0    100G  0 lvm  /opt
+
+# 如果查看不到新创建的lvm信息，可以使用resize2fs来刷新文件系统
+# resize2fs /dev/mapper/LVM-DB_DATA
+```
+这里便已经结束，**无需再次格式化**(否则会格式化之前创建好的 ``逻辑卷`` 中已有的数据)，也无需再次执行挂载和配置开机挂载
+
+
+## 结合PHALA用户情况处理磁盘容量
