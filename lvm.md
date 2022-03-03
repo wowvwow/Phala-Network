@@ -26,8 +26,8 @@
 
 因此完美的解决方法应该是在零停机前提下可以自如对文件系统的大小进行调整，可以方便实现文件系统跨越不同磁盘和分区。幸运的是Linux提供的逻辑盘卷管理（LVM，LogicalVolumeManager）机制就是一个完美的解决方案。
 
-引用：[LVM](https://baike.baidu.com/item/LVM/6571177)
-
+引用：[LVM](https://baike.baidu.com/item/LVM/6571177)  
+参考：[ArchWiki](https://wiki.archlinux.org/title/LVM_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))
 
 ## LVM创建与扩容
 ### LVM创建
@@ -161,6 +161,10 @@ Logical volume "LVM_DB_DATA" created
 # lvcreate –n [逻辑卷名] –l [物理扩展（PE）大小(上面对应的Free PE / Size对应的指标)] [要创建的 LV 所在的卷组名称]
 lvm> lvcreate -n DB_DATA -l 25590 LVM 
   Logical volume "LVM_DB_DATA" created.
+
+# 你也可以使用如下命令替换上面的命令, 其中 -l 100%FREE, 表示使用当前剩余的Free PE大小
+# # lvcreate –n [逻辑卷名] –l [100%FREE] [要创建的 LV 所在的卷组名称]
+lvm> lvcreate -n DB_DATA -l 100%FREE LVM
 
 # 查看创建的逻辑卷信息，注意核对 LV Path(后期要开机挂载的路径)，LV Name，VG Name，LV Size, Current LE等参数
 lvm> lvdisplay
@@ -338,6 +342,9 @@ lvm> lvdisplay
 lvm> lvextend -l +25590 /dev/LVM/DB_DATA
   Size of logical volume LVM/DB_DATA changed from <100.00 GiB (25590 extents) to 199.99 GiB (51180 extents).
   Logical volume LVM/DB_DATA successfully resized.
+  
+# 也可以使用下面命令，替换上面的命令，更新详细可以查看文档帮助
+lvm> lvextend -l +100%FREE -r /dev/LVM/DB_DATA
 ```
 再次查看 ``PV`` 信息，``/dev/sda2``和``/dev/sdb`` 已经同属于一个 ``VG Name``下面
 ```shell
