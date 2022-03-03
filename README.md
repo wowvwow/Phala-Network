@@ -4,9 +4,9 @@ No cheap. Let's go.
 
 本仓库宗旨和用途：
 
-1. 如何长期稳定且无人值守的情况下进行phala-network活动
-2. 基于linux基本操作，以更好的节省时间成本，为miner少走弯路，并获取更多的利益
-3. 降低用户使用门槛，扩大phala-network生态圈
+1. 降低用户使用门槛，扩大phala-network生态圈
+2. 如何长期稳定且无人值守的情况下进行phala-network活动
+3. 基于linux基本操作，以更好的节省时间成本，为miner少走弯路，获取更多的利益
 4. 此内容和代码仅适用于ubuntu18.04和ubuntu20.04，建议优先使用ubuntu20.04，卓面版和服务器版均可
 
 
