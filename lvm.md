@@ -53,26 +53,31 @@ sudo apt install -y lvm2
 - #### 单独分区创建LVM 
 以下演示分区为``/dev/sda2``分区，该分区挂载``/opt``目录，我们现在将其转换为``lvm``，请注意，``/dev/sda2``，核对好你要转换的分区名  
 
-该分区为空数据分区，无数据存放，方可操作，否则后果自负  
-
-该分区如果存有需要数据，请迁移到其他分区目录保存后，方可操作
+>> 该分区为空数据分区，无数据存放，方可操作，否则后果自负  
+> 
+>>该分区如果存有需要数据，请迁移到其他分区目录保存后，方可操作
 
 1. 查看块设备信息
 ```shell
-# umount /dev/sda2                      # 如果待转换的分区已经挂载到了某个目录如/opt，需要先取消挂载
-
 # lsblk
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
 sda      8:0    0  150G  0 disk 
 ├─sda1   8:1    0   50G  0 part /
 └─sda2   8:5    0  100G  0 part /opt
 
+# 如果待转换的分区已经挂载到了某个目录如/opt，需要先取消挂载
+# umount /dev/sda2                      
+```
+
+2. 进入lvm
+```shell
 # 进入lvm操作终端，输入help，可以查看更多帮助
 # lvm
 lvm> help
+```
 
-
-# 创建物理卷PV(Physical Volume)
+3. 创建物理卷PV(Physical Volume)
+```shell
 # 先查看一些是否存在PV，分区中没有lvm时，输出为空，往下执行
 lvm> pvdisplay
                                       
@@ -96,9 +101,10 @@ lvm> pvdisplay
   Free PE               0
   Allocated PE          0
   PV UUID               qLwrce-jsUg-1nCe-URfb-W7IU-K7El-UJ3l0f
+```
 
-
-# 创建VG卷组(Volume Group)
+4. 创建VG卷组(Volume Group)
+```shell
 # 卷组由你创建的 LVM 物理卷PV组成
 # 你可以将物理卷添加到现有的卷组中，或者根据需要为物理卷创建新的卷组
 # vgcreate  [卷组名(自定义)]  [物理卷名1(上面的/dev/sda2)]  [物理卷名2] ...
@@ -127,30 +133,31 @@ lvm> vgdisplay
   Alloc PE / Size       0 / 0   
   Free  PE / Size       25590 / 100.00 GiB
   VG UUID               brnxX3-XYO5-Ajsr-CkbG-rzeS-7uBq-4yrO9o
+```
 
-
-# 扩展卷组
+5. 扩展卷组
+```shell
 # 扩展卷组，是用来帮助扩展VG空间，VG空间不够用了，后期还可以动态添加更多的空间
 # vgextend [已有卷组名(对应上面创建VG name: LVM)] [物理卷名(上面对应的/dev/sda2)]
-lvm> vgextend LVM /dev/sda2             # 
+lvm> vgextend LVM /dev/sda2             
   Physical volume '/dev/sda2' is already in volume group 'LVM'
   Unable to add physical volume '/dev/sda2' to volume group 'LVM'
   /dev/sdb2: physical volume not initialized.
+```
 
-
-# 创建逻辑卷
-# 以GB为单位创建逻辑卷，如果上面的VG Size 显示为100.00 GiB，可以直接采用，如果显示为 < 100.00 GiB，请采用PE创建逻辑卷
-# 以PE大小创建逻辑卷
-# 二者采用其一即可，建议根据情况采用，多采用PE大小创建逻辑卷
-
-# 法一：
-# 使用GB为单位创建逻辑卷
+6. 创建逻辑卷  
+   - 以``GB``为单位创建逻辑卷，如果上面的VG Size 显示为100.00 GiB，可以直接采用，如果显示为 < 100.00 GiB，请采用PE创建逻辑卷
+   - 以``PE``大小创建逻辑卷  
+   - 二者采用其一即可，建议根据情况采用，多采用``PE``大小创建逻辑卷
+   
+> 使用GB为单位创建逻辑卷
+```shell
 # lvcreate –n [逻辑卷名(自定义)] –L [逻辑卷大小(VG Size对应的指标)] [要创建的 LV 所在的卷组名称(VG name对应名)]
 lvm> lvcreate -n DB_DATA -L 100G LVM
 Logical volume "LVM_DB_DATA" created
-
-# 法二：
-# 使用PE大小创建逻辑卷
+```
+> 使用PE大小创建逻辑卷
+```shell
 # lvcreate –n [逻辑卷名] –l [物理扩展（PE）大小(上面对应的Free PE / Size对应的指标)] [要创建的 LV 所在的卷组名称]
 lvm> lvcreate -n DB_DATA -l 25590 LVM 
   Logical volume "LVM_DB_DATA" created.
@@ -173,14 +180,14 @@ lvm> lvdisplay
   Read ahead sectors     auto
   - currently set to     256
   Block device           254:0
-
-
-# lvm整个创建过程完成，退出lvm命令行exit/quit
+```
+至此，``lvm``整个创建过程完成，退出``lvm``命令行``exit``/``quit``，别着急，请**继续**往下看
+```shell
 lvm> 
 lvm> exit
-
-
-# 再次查看系统块设备信息，对应的lvm出现，说明/dev/sda2分区已经转换为lvm了，继续往下走
+```
+再次查看系统块设备信息，对应的``lvm``出现，说明``/dev/sda2``分区已经转换为``lvm``了，继续往下走
+```shell
 # lsblk
 sda                   8:16   0   150G  0 disk 
 ├─sda1                8:17   0    50G  0 part  /
@@ -189,13 +196,13 @@ sda                   8:16   0   150G  0 disk
   
 # 如果lsblk查看不到lvm的逻辑卷，可以尝试使用resize2fs命令刷新文件系统，或者重启系统
 # resize2fs /dev/mapper/LVM-DB_DATA
-
+```
   
-# 创建文件系统
-# 在创建有效的文件系统之前，是不能使用逻辑卷的，会无法挂载到其他目录
-# 创建文件系统时，必须指定逻辑卷名位置，否则对应块设备名，不能对应 /dev/sda2 ，否则无法格式化
-# 这里使用 ext4 文件系统，其他文件系统，如 xfs 等，请使用 mkfs -t xfs /dev/mapper/LVM-DB_DATA 命令
-
+7. 创建文件系统  
+在创建有效的文件系统之前，是不能使用逻辑卷的，会无法挂载到其他目录  
+创建文件系统时，必须指定逻辑卷名位置，否则对应块设备名，不能对应 ``/dev/sda2`` ，否则无法格式化  
+这里使用 ``ext4`` 文件系统，其他文件系统，如 ``xfs`` 等，请使用 ``mkfs -t xfs /dev/mapper/LVM-DB_DATA`` 命令  
+```shell
 # mkfs.ext4 /dev/mapper/LVM-DB_DATA
 mke2fs 1.46.4 (18-Aug-2021)
 Creating filesystem with 2620416 4k blocks and 655360 inodes
@@ -207,8 +214,10 @@ Allocating group tables: done
 Writing inode tables: done                            
 Creating journal (16384 blocks): done
 Writing superblocks and filesystem accounting information: done 
+```
 
-
+8. 挂载
+```shell
 # 手动挂载
 # mount /dev/mapper/LVM-DB_DATA /opt
 
@@ -219,10 +228,9 @@ Writing superblocks and filesystem accounting information: done
 # 查看挂载的lvm卷
 # df -hT 
 /dev/mapper/LVM-DB_DATA ext4      99.8G   24K  99.3G   1% /opt
-
-
-# 至此，完成整个lvm的创建过程
 ```
+至此，整个lvm的创建过程，才最终完成
+
 参照：  
 [国内相关文档](https://linux.cn/article-12670-1.html)  
 [国外相关文档](https://www.2daygeek.com/create-lvm-storage-logical-volume-manager-in-linux/)
@@ -238,8 +246,8 @@ Writing superblocks and filesystem accounting information: done
 
 如果系统中，已经存在了块设备的lvm转换，新增一块磁盘，但是又作为不同的数据存储，想区分已经存在的``lvm``，可以设置不同的卷组，请参考上面 [单独磁盘创建LVM](#单独分区创建LVM) 步骤，请设置不同的``VG卷组名`` 和 ``逻辑卷名``，来区分已经存在的``VG卷组`` 和 ``逻辑卷名``，来达到不同的专用数据存储目录，方便后期数据动态扩容磁盘
 
-如果系统中，已经存在了块设备的lvm转换，但是该lvm对应的``VG卷组名``下的``逻辑卷``不够用了，新增一块磁盘，来进行动态扩容，请参考以下步骤：  
-如：我们将给上面的/dev/sda2对应的``VG卷组``中的``逻辑卷``进行扩容，新增一块100G大小的磁盘/dev/sdb，来进行演示
+如果系统中，已经存在了块设备的``lvm``转换，但是该``lvm``对应的``VG卷组名``下的``逻辑卷``不够用了，新增一块磁盘，来进行动态扩容，请参考以下步骤：  
+如：我们将给上面的``/dev/sda2``对应的``VG卷组``中的``逻辑卷``进行扩容，新增一块100G大小的磁盘``/dev/sdb``，来进行演示
 ```shell
 # 查看系统新增的块设备信息
 # lsblk
@@ -248,12 +256,18 @@ sda      8:0    0  150G  0 disk
 ├─sda1   8:1    0   50G  0 part /
 └─sda2   8:5    0  100G  0 part /opt
 sdb      8:16   0  100G  0 disk
+```
+这一步``/dev/sda2`` 以及挂载好了，无需取消挂载，只需要确定新增磁盘``/dev/sdb`` 未挂载即可
 
-# 进入lvm
+进入lvm
+```shell
 # lvm
+```
 
-# 创建PV
-# 该命令，会格式化/dev/sdb磁盘，请核对好块设备对应磁盘名，但不会影响/dev/sda2对应的逻辑卷里面的数据，从而来实现不停机，不停服务，给逻辑卷的动态扩容
+创建PV
+```shell
+# 该命令，会格式化/dev/sdb磁盘，请核对好块设备对应磁盘名
+# 但不会影响/dev/sda2对应的逻辑卷里面的数据，从而来实现不停机，不停服务，给逻辑卷的动态扩容
 lvm> pvcreate /dev/sdb
   Physical volume "/dev/sdb" successfully created.
 # 查看PV信息  
@@ -269,8 +283,10 @@ lvm> pvdisplay /dev/sdb
   Free PE               0
   Allocated PE          0
   PV UUID               MwEbyg-Pj3o-xHfo-6Ri6-fQv7-eDIf-meYP2H
-  
-# 扩展卷组，LVM 对应之前定义的卷组名VG Name
+```
+
+扩展卷组，逻辑卷``LVM`` 对应之前定义的卷组名``VG Name``
+```shell
 lvm> vgextend LVM /dev/sdb
   Volume group "LVM" successfully extended
 # 查看扩展卷组信息
@@ -295,8 +311,9 @@ lvm> vgdisplay
   Alloc PE / Size       25590 / <100.00 GiB
   Free  PE / Size       25590 / <100.00 GiB
   VG UUID               HwURLY-JDrg-il1S-YRD3-WrVo-suly-zoHHVO
-  
-# 扩展逻辑卷
+```
+扩展逻辑卷
+```shell
 # 先查看当前存在的逻辑卷信息
 lvm> lvdisplay
   --- Logical volume ---
@@ -315,13 +332,15 @@ lvm> lvdisplay
   Read ahead sectors     auto
   - currently set to     256
   Block device           254:0
-  
-# 再扩展逻辑卷，这里采用PE大小，下面的25590，从vgdisplay中的 Free  PE / Size 获取
+``` 
+再扩展逻辑卷，这里采用PE大小，下面的25590，从``vgdisplay``中的 ``Free  PE / Size`` 获取
+```shell
 lvm> lvextend -l +25590 /dev/LVM/DB_DATA
   Size of logical volume LVM/DB_DATA changed from <100.00 GiB (25590 extents) to 199.99 GiB (51180 extents).
   Logical volume LVM/DB_DATA successfully resized.
-  
-# 再次查看 PV 信息，/dev/sda2和/dev/sdb已经同属于一个VG Name下面
+```
+再次查看 ``PV`` 信息，``/dev/sda2``和``/dev/sdb`` 已经同属于一个 ``VG Name``下面
+```shell
 lvm> pvdisplay 
   --- Physical volume ---
   PV Name               /dev/sda2
@@ -344,8 +363,9 @@ lvm> pvdisplay
   Free PE               0
   Allocated PE          25590
   PV UUID               MwEbyg-Pj3o-xHfo-6Ri6-fQv7-eDIf-meYP2H
-
-# 再次查看 LV 信息，/dev/LVM/DB_DATA 逻辑卷已经扩容到199.99GB，就是我们要从100G扩容到了200G
+```
+再次查看 ``LV`` 信息，``/dev/LVM/DB_DATA`` 逻辑卷已经扩容到199.99GB，就是我们要从100G扩容到了200G
+```shell
 lvm> lvdisplay 
   --- Logical volume ---
   LV Path                /dev/LVM/DB_DATA
@@ -363,11 +383,14 @@ lvm> lvdisplay
   Read ahead sectors     auto
   - currently set to     256
   Block device           254:0
-
-# 完成逻辑卷扩容，退出exit
+```
+完成逻辑卷扩容，退出``exit``
+```shell
 lvm> exit
+```
 
-# 再次查看块设备信息
+再次查看块设备信息
+```shell
 # lsblk
 sda               8:0    0    150G  0 disk 
 ├─sda1            8:1    0     50G  0 part /
@@ -383,3 +406,7 @@ sdb               8:16   0    100G  0 disk
 
 
 ## 结合PHALA用户情况处理磁盘容量
+
+### 完美布局：独立系统盘+独立数据盘
+个人认为比较完美的磁盘布局：``独立的系统盘`` + ``独立的数据盘``，钱多事少，自由多  
+对于Phala用户，我个人建议``独立的系统盘``控制到``120G``，``独立的数据盘`` ``2T+``
