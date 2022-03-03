@@ -29,6 +29,9 @@ No cheap. Let's go.
   - [部署](#部署)
     - [单机部署](#单机部署)
     - [集群部署](#集群部署)
+  - [更新](#更新)
+    - [单机更新](#单机更新)
+    - [集群更新](#集群更新)
 - [维护](#维护)
   - [节点维护](#节点维护)
   - [单机维护](#单机维护)
@@ -77,7 +80,7 @@ No cheap. Let's go.
 
 ### 准备
 1. 系统安装准备工作
-> 系统安装 ——> [系统初始化](init.md) ——> [固态数据盘LVM配置](https://zhuanlan.zhihu.com/p/67166867) ——> 挂载固态数据盘到/opt下面(并**配置开机启动挂载**)
+> 系统安装 ——> [系统初始化](init.md) ——> [数据盘LVM配置](lvm.md)
 
 **以下脚本位置，均放置在/opt目录下，进行操作演示**
 
@@ -106,6 +109,13 @@ No cheap. Let's go.
 [参考其他文档](https://github.com/suugee/phala-prb)
 
 
+## 更新
+### 单机更新
+
+
+### 集群更新
+
+
 ## 维护
 
 ### 节点维护
@@ -130,6 +140,11 @@ No cheap. Let's go.
 >   docker restart bridge_fetch_1
 > ```
 
+### 单机维护
+
+
+
+### 集群维护
 - **定期重启prb的生命管理周期程序**
 
 这样做目的，是为了防止 ``prb`` 监控面板出现未预期的unresponsive
@@ -148,6 +163,7 @@ No cheap. Let's go.
 */5 * * * * cd /opt/scripts/for_prb_monitor/; python3 restart_mis_and_timeout.py
 ```
 
+### 其他维护
 
 ## 批处理
 ### 批量添加worker

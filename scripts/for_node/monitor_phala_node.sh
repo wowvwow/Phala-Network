@@ -1,8 +1,6 @@
 #!/bin/bash
 
 
-
-
 crt_time=`date +"%Y%m%d-%H%M%S"`
 crt_ip=`ip a | grep -EA3 ".*: e.*:" | grep inet | awk '{print $2}' | awk -F'/' '{print $1}' | head -n1`
 
