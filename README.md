@@ -119,9 +119,9 @@ No cheap. Let's go.
 # 通过添加定时任务，定时检测高度并自动重启node
 */5 * * * * cd /opt/scripts/for_node/ ; bash monitor_phala_node.sh
 ```
-> 如果你是solo用户，你可以修改``monitor_phala_node.sh``脚本，可以通过调用``ssh``免密 或者 [ansible](http://ansible.com.cn/) 等工具来重启旗下worker机器的 **phala-pherry** ，保持worker机器正常运行  
+> 如果你是solo用户，你可以修改 [monitor_phala_node](scripts/for_node/monitor_phala_node.sh) 脚本，可以通过调用``ssh``免密 或者 [ansible](http://ansible.com.cn/) 等工具来重启旗下worker机器的 **phala-pherry** ，保持worker机器正常运行  
 > 
-> 如果你是集群用户，你需要取消``monitor_phala_node.sh``脚本的以下注释，重启 **bridge_fetch_1** ，是为了防止重启node后，prb的同步状态出现-1的情况，先停prb组件，再启动prb组件，防止prb同步数据出现异常
+> 如果你是集群用户，你需要取消 [monitor_phala_node](scripts/for_node/monitor_phala_node.sh) 脚本的以下注释，重启 **bridge_fetch_1** ，是为了防止重启node后，prb的同步状态出现-1的情况，先停prb组件，再启动prb组件，防止prb同步数据出现异常
 > ```shell
 >   # 集群用户
 >   docker ps -a | grep bridge | awk '{print $1}' | xargs docker stop
