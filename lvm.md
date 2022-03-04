@@ -50,7 +50,17 @@ sudo apt update
 sudo apt install -y lvm2
 ```
 
-- #### 单独分区创建LVM 
+- #### 单独分区创建LVM
+单独分区磁盘结构(如下面的/dev/sda2分区，即该分区，用于用户可以自定义挂载目录，不与`/`冲突)
+```shell
+# 查看块设备结构
+# lsblk
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+sda      8:0    0  150G  0 disk 
+├─sda1   8:1    0   50G  0 part /
+└─sda2   8:5    0  100G  0 part /opt
+```
+
 以下演示分区为``/dev/sda2``分区，该分区挂载``/opt``目录，我们现在将其转换为``lvm``，请注意，``/dev/sda2``，核对好你要转换的分区名  
 
 >> 该分区为空数据分区，无数据存放，方可操作，否则后果自负  
@@ -193,6 +203,7 @@ lvm> exit
 再次查看系统块设备信息，对应的``lvm``出现，说明``/dev/sda2``分区已经转换为``lvm``了，继续往下走
 ```shell
 # lsblk
+NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
 sda                   8:16   0   150G  0 disk 
 ├─sda1                8:17   0    50G  0 part  /
 └─sda2                8:18   0   100G  0 part 
@@ -239,7 +250,15 @@ Writing superblocks and filesystem accounting information: done
 [国内相关文档](https://linux.cn/article-12670-1.html)  
 [国外相关文档](https://www.2daygeek.com/create-lvm-storage-logical-volume-manager-in-linux/)
 
-- #### 单独磁盘创建LVM 
+- #### 单独磁盘创建LVM
+单独磁盘创建LVM，如下面的`/dev/sdb`，该磁盘为空数据盘，用户可任意转换为`lvm`
+```shell
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+sda      8:0    0  150G  0 disk 
+├─sda1   8:1    0   50G  0 part /
+└─sda2   8:5    0  100G  0 part /opt
+sdb      8:16   0  100G  0 disk
+```
 单独磁盘创建lvm，其实和单独分区创建lvm，没有什么区别，按照上面的步骤，将``/dev/sda2`` 换成你的块设备名，通过 ``lsblk`` 查看系统新加入的磁盘  
 > 如：新增了一块SATA盘：``/dev/sdb`` , 将``/dev/sda2`` 换成 ``/dev/sdb``，进行操作  
 > 如：新增了一块固态盘：``/dev/nvme0n1`` , 将``/dev/sda2`` 换成 ``/dev/nvme0n1``，进行操作
@@ -399,12 +418,13 @@ lvm> exit
 再次查看块设备信息
 ```shell
 # lsblk
-sda               8:0    0    150G  0 disk 
-├─sda1            8:1    0     50G  0 part /
-└──sda2            8:2   0    100G  0 part 
-   └─LVM-DB_DATA 254:0   0    100G  0 lvm  /opt
-sdb               8:16   0    100G  0 disk 
-└─LVM-DB_DATA 253:0      0    100G  0 lvm  /opt
+NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda                  8:0   0    150G  0 disk 
+├─sda1               8:1   0     50G  0 part /
+└──sda2              8:2   0    100G  0 part 
+   └─LVM-DB_DATA   254:0   0    100G  0 lvm  /opt
+sdb                 8:16   0    100G  0 disk 
+└─LVM-DB_DATA      253:0   0    100G  0 lvm  /opt
 
 # 如果查看不到新创建的lvm信息，可以使用resize2fs来刷新文件系统
 # resize2fs /dev/mapper/LVM-DB_DATA
@@ -415,11 +435,33 @@ sdb               8:16   0    100G  0 disk
 ## 结合PHALA用户情况处理磁盘容量
 
 ### 完美布局：独立系统盘与独立数据盘
+独立系统盘与独立数据盘块结构如下：
+其中`/dev/sda`块设备，作为独立的系统盘，余下的`/dev/nvmeXnX`块设备，都加入到了同一个lvm卷组
+```shell
+NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda             8:0    0 111.8G  0 disk 
+├─sda1          8:1    0   512M  0 part /boot/efi
+└─sda2          8:2    0 111.3G  0 part /
+nvme1n1       259:0    0 894.3G  0 disk 
+└─LVM-DB_DATA 253:0    0   3.6T  0 lvm  /opt
+nvme2n1       259:1    0 894.3G  0 disk 
+└─LVM-DB_DATA 253:0    0   3.6T  0 lvm  /opt
+nvme0n1       259:2    0   1.8T  0 disk 
+└─LVM-DB_DATA 253:0    0   3.6T  0 lvm  /opt
+```
+
 个人认为比较完美的磁盘布局：``独立的系统盘`` + ``独立的数据盘``，钱多事少，自由多  
 对于Phala用户，我个人建议``独立的系统盘``控制到``120G``，``独立的数据盘`` 至少 ``2T+``，同时``独立的数据盘``转换为``lvm``，或者多块1T的数据盘并为一组逻辑卷组
 
 ### 系统与数据共用一块盘
 #### 无单独的数据分区
+无单独的数据分区块结构如下：
+```shell
+NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda             8:0    0     1T  0 disk 
+├─sda1          8:1    0   512M  0 part /boot/efi
+└─sda2          8:2    0   998G  0 part /
+```
   - 该情况：即``/``分区作为数据存放的目录，如果``/``分区空间不足，先清理系统无用文件，释放一定空间，但仅仅无法满足需求，对于此，在保留系统文件的情况下，只能添加新磁盘来达到更多的使用空间，最好将新磁盘转换为lvm，方便后期动态扩容
 
 
@@ -492,12 +534,15 @@ sdb               8:16   0    100G  0 disk
     # 查看逻辑卷/dev/mapper/LVM-DB_DATA，是否挂载到了 /opt 目录下
     lsblk
     cd /opt/
+    ```
+    ```shell
     # solo用户：可能有以下目录文件，请核对设计phala的文件目录，集中保存到当前挂载后的 /opt 目录下
     ls -lha containerd intel phala khala-dev-node 
     
     # 集群用户：可能有以下目录文件，请核对涉及phala的文件目录，集中保存到当前挂载后的 /opt 下
     ls -lha containerd intel phala khala-dev-node bridge_data
-    
+    ```
+    ```shell
     # solo用户：设置 phala-node 服务的数据目录
     # 使用软链接
     sudo ln -s /opt/khala-dev-node /var/khala-dev-node
@@ -506,9 +551,11 @@ sdb               8:16   0    100G  0 disk
     # 也可以通过修改phala-node程序的docker-pose.yml对应的.env文件
     # 假设你的phala-node的启动目录 /opt/phala/  则修改.env中，如下行
     NODE_VOLUMES=/var/khala-dev-node:/root/data  ——>  NODE_VOLUMES=/opt/khala-dev-node:/root/data     
+    ```
     
-    # 集群用户将 phala-runtime-bridge 的安装目录 runtime-bridge/docker/testing/bridge/docker-compose.example.yml 拷贝到/opt/bridge_data/ 下面，与/opt/bridge_data/ 中prb数据目录在同一位置，方便直接启动
+    集群用户将 phala-runtime-bridge 的安装目录 runtime-bridge/docker/testing/bridge/docker-compose.example.yml 拷贝到/opt/bridge_data/ 下面，与/opt/bridge_data/ 中prb数据目录在同一位置，方便直接启动
     
+    ```shell
     # 启动 phala-node，假设你的 phala-node 的 docker-compose.yml 目录为 /opt/phala/
     cd /opt/phala/ 
     docker-compose up -d phala-node
@@ -516,7 +563,8 @@ sdb               8:16   0    100G  0 disk
     # 查看日志，查看高度是否从最近的高度接着走，
     # ctrl+c，中止
     docker logs -f --tail=100 phala-node
-    
+    ```
+    ```shell
     # 启动 phala-runtime-bridge，假设你的 phala-runtime-bridge 的 docker-compose.yml 目录为 /opt/bridge_data/
     cd /opt/bridge_data/
     docker-compose up -d
@@ -529,9 +577,42 @@ sdb               8:16   0    100G  0 disk
   
 #### 有单独的数据分区
 ###### 单独的数据分区为lvm
+单独的数据分区为`lvm`，对应的块设备结构，类似如下：
+```shell
+NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda                  8:0   0    150G  0 disk 
+├─sda1               8:1   0     50G  0 part /
+└──sda2              8:2   0    100G  0 part 
+   └─LVM-DB_DATA   254:0   0    100G  0 lvm  /opt
+```
+或者：
+```shell
+NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda             8:0    0 111.8G  0 disk 
+├─sda1          8:1    0   512M  0 part /boot/efi
+└─sda2          8:2    0 111.3G  0 part /
+nvme1n1       259:0    0     4T  0 disk 
+└─LVM-DB_DATA 253:0    0   3.6T  0 lvm  /opt
+```
+
 这种情况，有单独的数据分区，并且为lvm，意思就是，你将phala的所有数据都存放在了一个单独的数据分区里面，并且很幸运的是该分区还是lvm，那就通过新增更大的磁盘，来进行lvm的动态扩容处理，参考 [LVM扩容](#LVM扩容)
 
-###### 单独的数据分区非lvm 
+###### 单独的数据分区非lvm
+单独的数据分区`非lvm`的块设备结构，类似如下
+```shell
+NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda                  8:0   0    150G  0 disk 
+├─sda1               8:1   0     50G  0 part /
+└──sda2              8:2   0    100G  0 part /opt 
+```
+或者：
+```shell
+NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda             8:0    0 111.8G  0 disk 
+├─sda1          8:1    0   512M  0 part /boot/efi
+└─sda2          8:2    0 111.3G  0 part /
+nvme1n1       259:0    0 894.3G  0 disk /opt
+```
 这种情况，与上面相反，phala的所有数据存在一个不是lvm的单独数据分区里面，其实也是新增磁盘、磁盘转lvm、数据迁移新盘、再将之前的单独数据分区转加入新盘的lvm卷组，只比 [无单独的数据分区](#无单独的数据分区)  少走一步``利用U盘进入系统调整/分区大小``
 
 
