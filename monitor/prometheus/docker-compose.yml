@@ -121,26 +121,26 @@ services:
   # net:
   #  - hosts
 
-# phala-metrics:
-#  image: metrics:latest
-#  hostname: prometheus-phala-metrics
-#  container_name: prometheus-phala-metrics
+# phala-network-all:
+#  image: phala-netwrk-all:latest
+#  hostname: prometheus-phala-network-all
+#  container_name: prometheus-phala-network-all
 #  restart: always
 #  ports:
 #    - "5000:5000"
 #
-# phala-metrics2:
-#  image: metrics2:latest
-#  hostname: prometheus-phala-metrics2
-#  container_name: prometheus-phala-metrics2
+# phala-runtime-bridge:
+#  image: phala-runtime-bridge:latest
+#  hostname: prometheus-phala-runtime-bridge
+#  container_name: prometheus-phala-runtime-bridge
 #  restart: always
 #  ports:
 #    - "5003:5003"
 #
-# phala-metrics3:
-#  image: metrics3:latest
-#  hostname: prometheus-phala-metrics3
-#  container_name: prometheus-phala-metrics3
+# phala-app:
+#  image: phala-app:latest
+#  hostname: prometheus-phala-app
+#  container_name: prometheus-phala-app
 #  restart: always
 #  ports:
 #    - "5002:5002"
