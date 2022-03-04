@@ -1,6 +1,6 @@
 # LVM磁盘处理
 
-# ***数据无价，谨慎操作，一切后果自行承担***
+# ***数据无价，谨慎操作，一切后果需自行承担***
 
 
 ## 内容列表
@@ -445,12 +445,16 @@ sdb               8:16   0    100G  0 disk
     # 停止 phala-node 服务，如果存在定时任务重启，请暂时注销
     sudo docker stop phala-node
     
-    # 集群用户，还需要停止 phala-runtime-bridge（prb）所有组件，如果存在定时任务重启，请暂时注销
+    # 集群用户：还需要停止 phala-runtime-bridge（prb）所有组件，如果存在定时任务重启，请暂时注销
     sudo docker ps -a | grep bridge | awk '{print $1}' | xargs docker stop
     ```
     ```shell
-    # 拷贝 phala-node数据 和 phala-runtime-bridge数据 到 新增磁盘 对应的逻辑卷上，并放置后台运行，这一步将花费数个小时时间
+    # solo用户： 拷贝 phala-node数据 到 新增磁盘 对应的逻辑卷上，并放置后台运行，这一步将花费数个小时时间
+    nohup sudo rsync -avzP --progress --delete /var/khala-dev-node /mnt/ &>./phala-data.txt &
+    
+    # 集群用户： 拷贝 phala-node数据 和 phala-runtime-bridge数据 到 新增磁盘 对应的逻辑卷上，并放置后台运行，这一步将花费数个小时时间
     nohup sudo rsync -avzP --progress --delete /var/khala-dev-node /opt/bridge_data /mnt/ &>./phala-data.txt &
+    
     # 查看拷贝文件进度
     tail -f ./phala-data.txt
     
@@ -482,6 +486,46 @@ sdb               8:16   0    100G  0 disk
     当你正常进入系统后，我们接着往下走，我们将刚``/`` 多余的空间，新建了分区，接着将新建的分区，加入到新磁盘对应的``/dev/mapper/LVM-DB_DATA``逻辑卷组中，具体步骤参考 [单独分区创建lVM](#单独分区创建LVM) 
 
     至此，完成 [无单独的数据分区](#无单独的数据分区) 这种情况，新增磁盘、扩容磁盘等操作
+  
+    最后的一步，就是修改和调整``phala-node``和``phala-runtime-bridge``的数据存储目录，假设上面的步骤完成无误，并且刚做好的用于存放的数据逻辑卷，配置好了开机挂载到``/opt``下面，
+    ```shell
+    # 查看逻辑卷/dev/mapper/LVM-DB_DATA，是否挂载到了 /opt 目录下
+    lsblk
+    cd /opt/
+    # solo用户：可能有以下目录文件，请核对设计phala的文件目录，集中保存到当前挂载后的 /opt 目录下
+    ls -lha containerd intel phala khala-dev-node 
+    
+    # 集群用户：可能有以下目录文件，请核对涉及phala的文件目录，集中保存到当前挂载后的 /opt 下
+    ls -lha containerd intel phala khala-dev-node bridge_data
+    
+    # solo用户：设置 phala-node 服务的数据目录
+    # 使用软链接
+    sudo ln -s /opt/khala-dev-node /var/khala-dev-node
+    ls -l /var/khala-dev-node
+    
+    # 也可以通过修改phala-node程序的docker-pose.yml对应的.env文件
+    # 假设你的phala-node的启动目录 /opt/phala/  则修改.env中，如下行
+    NODE_VOLUMES=/var/khala-dev-node:/root/data  ——>  NODE_VOLUMES=/opt/khala-dev-node:/root/data     
+    
+    # 集群用户将 phala-runtime-bridge 的安装目录 runtime-bridge/docker/testing/bridge/docker-compose.example.yml 拷贝到/opt/bridge_data/ 下面，与/opt/bridge_data/ 中prb数据目录在同一位置，方便直接启动
+    
+    # 启动 phala-node，假设你的 phala-node 的 docker-compose.yml 目录为 /opt/phala/
+    cd /opt/phala/ 
+    docker-compose up -d phala-node
+    
+    # 查看日志，查看高度是否从最近的高度接着走，
+    # ctrl+c，中止
+    docker logs -f --tail=100 phala-node
+    
+    # 启动 phala-runtime-bridge，假设你的 phala-runtime-bridge 的 docker-compose.yml 目录为 /opt/bridge_data/
+    cd /opt/bridge_data/
+    docker-compose up -d
+    
+    # 查看日志，这一步得等phala-node的高度同步到最新后，prb-monitor的fetch页面，才会显示正常，当phala-node高度同步到了最新后，prb的fetch页面，还是全都显示为-1时，从尝试重启 bridge_fetch_1 服务
+    # ctrl+c，中止
+    docker logs -f --tail=100 bridge_fetch_1
+    ```
+    ok，数据迁移完成，磁盘扩容完成，服务启动完成
   
 #### 有单独的数据分区
 ###### 单独的数据分区为lvm
