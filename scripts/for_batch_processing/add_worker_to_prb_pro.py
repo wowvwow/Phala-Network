@@ -79,17 +79,17 @@ def add_worker_for_pid_ip(mnemonic, ip_port='192.168.3.100:3000'):
 
 if __name__ == '__main__':
     pass
-    # '''示例代码'''
+    # # '''示例代码'''
     # # worker_ips.txt文件，放置要添加到同一个prb的worker对应的ip地址，一行一个
     # # worker_pids_ips.txt文件，放置要添加到同一个prb的worker对应的pid和ip，以 : 分隔，一行一个
 
-    pid = 83
-    mnemonic1 = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
-    ip_port1 = '192.168.2.100:3000'
-    add_worker_for_ip(pid, ip_port1, mnemonic1)
+    # pid = 83
+    # mnemonic1 = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
+    # ip_port1 = '192.168.2.100:3000'
+    # add_worker_for_ip(pid, ip_port1, mnemonic1)
 
-    mnemonic2 = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
-    ip_port2 = 'prb-monitor对应的ip和port'
-    add_worker_for_pid_ip(ip_port2, mnemonic2)
+    # mnemonic2 = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
+    # ip_port2 = 'prb-monitor对应的ip和port'
+    # add_worker_for_pid_ip(ip_port2, mnemonic2)
 
-    # 其他情况，用户可自行添加
+    # # 其他情况，用户可自行添加
