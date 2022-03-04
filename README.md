@@ -172,6 +172,8 @@ No cheap. Let's go.
 2. 添加到同一个prb的worker，并且所有的worker对应不同的pid，但这些pid也使用同一个Gas账户，即同一个助记词
 3. 其他情况，可联系作者添加对应的方法
 
+完成批量添加步骤后，需要重启`bridge_lifecycle_1`程序，prb方可开始pruntime的同步等工作
+
 ### 批量启动worker
 有对应接口代码，批处理方法待开发
 ### 批量停止worker
