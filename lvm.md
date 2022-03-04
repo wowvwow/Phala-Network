@@ -51,7 +51,7 @@ sudo apt install -y lvm2
 ```
 
 - #### 单独分区创建LVM
-单独分区磁盘结构(如下面的/dev/sda2分区，即该分区，用于用户可以自定义挂载目录，不与`/`冲突)
+单独分区块结构，类似如下(如下面的/dev/sda2分区，即该分区，用于用户可以自定义挂载目录，不与`/`冲突)
 ```shell
 # 查看块设备结构
 # lsblk
@@ -251,7 +251,7 @@ Writing superblocks and filesystem accounting information: done
 [国外相关文档](https://www.2daygeek.com/create-lvm-storage-logical-volume-manager-in-linux/)
 
 - #### 单独磁盘创建LVM
-单独磁盘创建LVM，如下面的`/dev/sdb`，该磁盘为空数据盘，用户可任意转换为`lvm`
+单独磁盘创建LVM，类似如下面的`/dev/sdb`，该磁盘为空数据盘，用户可任意转换为`lvm`
 ```shell
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
 sda      8:0    0  150G  0 disk 
@@ -435,7 +435,7 @@ sdb                 8:16   0    100G  0 disk
 ## 结合PHALA用户情况处理磁盘容量
 
 ### 完美布局：独立系统盘与独立数据盘
-独立系统盘与独立数据盘块结构如下：
+独立系统盘与独立数据盘块结构，类似如下：
 其中`/dev/sda`块设备，作为独立的系统盘，余下的`/dev/nvmeXnX`块设备，都加入到了同一个lvm卷组
 ```shell
 NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
@@ -455,7 +455,7 @@ nvme0n1       259:2    0   1.8T  0 disk
 
 ### 系统与数据共用一块盘
 #### 无单独的数据分区
-无单独的数据分区块结构如下：
+无单独的数据分区块结构，类似如下：
 ```shell
 NAME          MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
 sda             8:0    0     1T  0 disk 
