@@ -1,0 +1,151 @@
+version: "3"
+services:
+ prometheus:
+   image: prom/prometheus
+   hostname: prometheus
+   restart: always
+   container_name: prometheus
+   ports:
+    - "9090:9090"
+   # environment:
+   # entrypoint: ["/bin/prometheus", "--web.enable-admin-api"]
+   volumes:
+    - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    - ./alert-rules.yml:/etc/prometheus/alert-rules.yml
+    - /opt/prometheus/data:/prometheus
+    - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime
+   command:
+     - '--config.file=/etc/prometheus/prometheus.yml'
+     - '--storage.tsdb.path=/prometheus' 
+     - '--web.console.libraries=/usr/share/prometheus/console_libraries' 
+     - '--web.console.templates=/usr/share/prometheus/consoles'
+     - '--web.enable-admin-api'
+
+ alertmanager:
+   image: prom/alertmanager
+   hostname: prometheus-alertmanager
+   restart: always
+   container_name: prometheus-alertmanager
+   ports:
+    - "9093:9093" 
+    - "9094:9094"
+   # devices:
+   # environment:
+   volumes:
+    - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+
+ alertdingtalk:
+   image: timonwong/prometheus-webhook-dingtalk
+   hostname: prometheus-webhook-dingtalk
+   restart: always
+   container_name: prometheus-webhook-dingtalk
+   # depends_on:
+   ports:
+    - "8060:8060"
+      # entrypoint: ["--web.enable-ui"]
+   volumes:
+    - ./dingding.yml:/etc/prometheus-webhook-dingtalk/config.yml
+
+ grafana:
+   image: grafana/grafana
+   hostname: prometheus-grafana
+   restart: always
+   container_name: prometheus-grafana
+   # depends_on:
+   # entrypoint:
+   ports:
+    - "3001:3000"
+   volumes:
+    - /opt/prometheus/grafana:/var/lib/grafana
+
+#  # 节点监控
+#  node-exporter:
+#    image: prom/node-exporter
+#    hostname: prometheus-node-exporter
+#    restart: always
+#    container_name: prometheus-node-exporter
+#    # depends_on:
+#    # entrypoint:
+#    ports:
+#     - "9100:9100"
+#    # volumes:
+
+# 节点监控
+ node-exporter:
+   image: quay.io/prometheus/node-exporter:latest
+   hostname: prometheus-node-exporter
+   container_name: prometheus-node-exporter
+   restart: always
+   command:
+     - '--path.rootfs=/host'
+       # network_mode: host
+   ports:
+     - "9100:9100"
+   pid: host
+   volumes:
+     - '/:/host:ro,rslave'
+
+ # 进程监控
+ process_exporter:
+   image: ncabatoff/process-exporter
+   container_name: prometheus-process_exporter
+   restart: always
+   # dns_search: .
+   # networks:
+   #   - nets
+   volumes:
+     # - ./proc:/host/proc
+     # - ./process_exporter/config:/config
+     - /proc:/host/proc
+     - ./process-exporter.yml:/config/process-exporter.yml
+   ports:
+     - "9256:9256"
+   tty: true
+   command: /bin/process-exporter --procfs /host/proc -config.path config/process-exporter.yml
+
+ # docker 监控
+ cadvisor:
+  image: google/cadvisor:latest
+  hostname: prometheus-docker-cadvisor
+  restart: always
+  container_name: prometheus-docker-cadvisor
+  # depends_on:
+  # entrypoint:
+  ports:
+   - "8080:8080"
+  volumes:
+   - /:/rootfs:ro
+   - /var/run:/var/run:rw
+   - /sys:/sys:ro
+   - /var/lib/docker/:/var/lib/docker:ro
+  # net:
+  #  - hosts
+
+# phala-metrics:
+#  image: metrics:latest
+#  hostname: prometheus-phala-metrics
+#  container_name: prometheus-phala-metrics
+#  restart: always
+#  ports:
+#    - "5000:5000"
+#
+# phala-metrics2:
+#  image: metrics2:latest
+#  hostname: prometheus-phala-metrics2
+#  container_name: prometheus-phala-metrics2
+#  restart: always
+#  ports:
+#    - "5003:5003"
+#
+# phala-metrics3:
+#  image: metrics3:latest
+#  hostname: prometheus-phala-metrics3
+#  container_name: prometheus-phala-metrics3
+#  restart: always
+#  ports:
+#    - "5002:5002"
+
+# networks:
+#   nets:
+#     external:
+#       name: workspace

@@ -183,6 +183,8 @@ No cheap. Let's go.
 
 
 ## 监控
+本监控，基于prometheus和grafana，进行数据采集和数据展示  
+请单独参考 [monitor](monitor/monitor.md)
 
 ### 全网数据监控
 后期补充

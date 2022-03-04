@@ -1,0 +1,61 @@
+version: "3"
+
+services:
+# 节点监控
+ node-exporter:
+   image: quay.io/prometheus/node-exporter:latest
+   hostname: prometheus-node-exporter
+   container_name: prometheus-node-exporter
+   restart: always
+   command:
+     - '--path.rootfs=/host'
+       # network_mode: host
+   ports:
+     - "9100:9100"
+   pid: host
+   volumes:
+     - '/:/host:ro,rslave'
+
+ # 进程监控
+ process_exporter:
+         # image: ncabatoff/process-exporter
+   image: registry.cn-shenzhen.aliyuncs.com/phalanetwork/process-exporter
+   container_name: prometheus-process_exporter
+   restart: always
+   # dns_search: .
+   # networks:
+   #   - nets
+   volumes:
+     # - ./proc:/host/proc
+     # - ./process_exporter/config:/config
+     - /proc:/host/proc
+     - /opt/prometheus/process-exporter.yml:/config/process-exporter.yml
+   ports:
+     - "9256:9256"
+   tty: true
+   command: /bin/process-exporter --procfs /host/proc -config.path config/process-exporter.yml
+
+ # docker 监控
+ cadvisor:
+         # image: google/cadvisor:latest
+  image: registry.cn-shenzhen.aliyuncs.com/phalanetwork/cadvisor
+  hostname: prometheus-docker-cadvisor
+  restart: always
+  container_name: prometheus-docker-cadvisor
+  # depends_on:
+  # entrypoint:
+  ports:
+   - "8080:8080"
+  volumes:
+   - /:/rootfs:ro
+   - /var/run:/var/run:rw
+   - /sys:/sys:ro
+   - /var/lib/docker/:/var/lib/docker:ro
+  # net:
+  #  - hosts
+
+ # networks:
+ #   nets:
+ #     external:
+ #       name: workspace
+

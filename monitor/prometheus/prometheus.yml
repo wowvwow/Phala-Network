@@ -1,0 +1,74 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+  scrape_timeout:      15s
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - 192.168.2.100:9093
+
+rule_files:
+  - "*rules.yml"
+  
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+    - targets: ['192.168.2.239:9090']
+
+  - job_name: 'alertmanager'
+    static_configs:
+    - targets: ['192.168.2.239:9093']
+
+  - job_name: 'node'
+    static_configs:
+    # - targets: ['192.168.30.135:9100','192.168.30.136:9100','192.168.30.137:9100']
+
+  - job_name: 'docker'
+    static_configs:
+    # - targets: ['192.168.30.135:9100','192.168.30.136:9100','192.168.30.137:9100']
+
+  # phala自带的node节点监控接口
+  - job_name: 'khala-node'
+    static_configs:
+    # - targets: ['192.168.30.135:9100','192.168.30.136:9100','192.168.30.137:9100']
+    - targets: [
+'192.168.2.100:9616',
+'192.168.3.100:9616',
+'192.168.4.100:9616',
+]
+
+#   # khala-prb
+#   - job_name: 'khala-prb'
+#     scrape_interval:     1m
+#     scrape_timeout:      1m
+#
+#     static_configs:
+#     # - targets: ['192.168.30.135:9100','192.168.30.136:9100','192.168.30.137:9100']
+#     - targets: [
+# '192.168.2.239:5000',
+# ]
+#
+#   # khala-app
+#   - job_name: 'khala-app'
+#     scrape_interval:     1m
+#     scrape_timeout:      1m
+#
+#     static_configs:
+#     # - targets: ['192.168.30.135:9100','192.168.30.136:9100','192.168.30.137:9100']
+#     - targets: [
+# '192.168.2.239:5002',
+# ]
+#
+#   # khala全网信息抓取
+#   - job_name: 'khala-all'
+#     scrape_interval:     5m
+#     scrape_timeout:      5m
+#     # evaluation_interval: 200s
+#
+#     static_configs:
+#     # - targets: ['192.168.30.135:9100','192.168.30.136:9100','192.168.30.137:9100']
+#     - targets: [
+# '192.168.2.239:5003',
+# ]
