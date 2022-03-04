@@ -100,7 +100,7 @@ WARNING: ext4 signature detected on /dev/sda2 at offset 1080. Wipe it? [y/n]: y
   
 # 再次查看，返回如下信息，说明该分区已经添加到LVM PV中
 lvm> pvdisplay                          
-  "/dev/sda2" is a new physical volume of "50.00 GiB"
+  "/dev/sda2" is a new physical volume of "100.00 GiB"
   --- NEW Physical volume ---
   PV Name               /dev/sda2
   VG Name               
@@ -157,8 +157,9 @@ lvm> vgextend LVM /dev/sda2
 
 6. 创建逻辑卷  
    - 以``GB``为单位创建逻辑卷，如果上面的VG Size 显示为100.00 GiB，可以直接采用，如果显示为 < 100.00 GiB，请采用PE创建逻辑卷
-   - 以``PE``大小创建逻辑卷  
-   - 二者采用其一即可，建议根据情况采用，多采用``PE``大小创建逻辑卷
+   - 以``PE``大小创建逻辑卷
+   - 以`百分比` 来使用所有剩余的Free PE大小，该方法更加方便创建逻辑卷
+   - 三者采用其一即可，建议根据情况采用
    
 > 使用GB为单位创建逻辑卷
 ```shell
