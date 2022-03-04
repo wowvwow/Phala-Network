@@ -122,7 +122,7 @@ No cheap. Let's go.
 
 - **node高度检测脚本**:
 
-[monitor_phala_node](scripts/for_node/monitor_phala_node.sh): 用来检测node节点高度是否持续性增长，并作出相应告警  
+[monitor_phala_node](scripts/for_node/monitor_phala_node.sh): 用来检测node节点高度是否持续性增长，发现phala-node出现卡高度的情况，会自动重启phala-node，并作出相应dingding告警
 
 [dingding](scripts/for_node/dingding.py) : 只支持dingding简单文本告警，同时你需要建立dingding群组，以获取[access_token](https://open.dingtalk.com/document/robots/custom-robot-access)  
 ```
