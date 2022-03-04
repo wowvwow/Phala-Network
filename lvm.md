@@ -172,8 +172,8 @@ Logical volume "LVM_DB_DATA" created
 lvm> lvcreate -n DB_DATA -l 25590 LVM 
   Logical volume "LVM_DB_DATA" created.
 
-# 你也可以使用如下命令替换上面的命令, 其中 -l 100%FREE, 表示使用当前剩余的Free PE大小
-# # lvcreate –n [逻辑卷名] –l [100%FREE] [要创建的 LV 所在的卷组名称]
+# 你也可以使用如下命令替换上面的命令, 其中 -l 100%FREE, 表示使用当前所有剩余的Free PE大小
+# # lvcreate –n [逻辑卷名] –l [百分比FREE(常用100%，来使用当前所有剩余的Free PE大小)] [要创建的 LV 所在的卷组名称]
 lvm> lvcreate -n DB_DATA -l 100%FREE LVM
 
 # 查看创建的逻辑卷信息，注意核对 LV Path(后期要开机挂载的路径)，LV Name，VG Name，LV Size, Current LE等参数
