@@ -25,9 +25,14 @@ docker_process展示效果：
 更多 [dashboards](https://grafana.com/dashboards/) ，用户可以自行选择
 
 ## 主网后期开放`phala-networker`数据获取与数据展示效果  
-效果图如下：  
+效果图如下：   
+- 全网数据效果图1  
 [![全网数据效果图1](https://github.com/wowvwow/Phala-Network/blob/main/png/phala-all-1.png)]()  
+- 全网数据效果图2  
 [![全网数据效果图2](https://github.com/wowvwow/Phala-Network/blob/main/png/phala-all-2.png)]()  
+- 全网数据效果图3  
 [![全网数据效果图3](https://github.com/wowvwow/Phala-Network/blob/main/png/phala-all-3.png)]()  
+- PRB本地数据效果图  
 [![本地数据效果图](https://github.com/wowvwow/Phala-Network/blob/main/png/phala-prb.png)]()  
+- APP面板数据效果图  
 [![面板数据效果图](https://github.com/wowvwow/Phala-Network/blob/main/png/phala-app.png)]()  
