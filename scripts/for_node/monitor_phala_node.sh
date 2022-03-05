@@ -8,8 +8,6 @@ crt_ip=`ip a | grep -EA3 ".*: e.*:" | grep inet | awk '{print $2}' | awk -F'/' '
 get_last_node_high(){
 	# - $1:
 
-	# [ ! -f .node_block_high.txt ] && get_crt_node_high 
-
 	last_highest_khala_node_block=`cat .node_block_high.txt | sed -n 1p | awk -F':' '{print $1}'`
 	last_khala_node_block=`cat .node_block_high.txt | sed -n 1p | awk -F':' '{print $2}'`
 
@@ -37,6 +35,7 @@ get_crt_node_high() {
 
 restart_node_server(){
 	# - $1:
+
 	# solo用户
   docker restart phala-node
 
@@ -48,30 +47,15 @@ restart_node_server(){
 }
 
 
-monitor_node_high() {	
-	# if [ $khala_diff_num -gt 30 -o $kusama_diff_num -gt 30 ] ; then
-	# if [ $khala_diff_num -lt 10 -o $kusama_diff_num -lt 10 ] ; then
-
+monitor_node_high() {
+  # - $1:
+  #
 
 	if [ ! -f .node_block_high.txt ] ; then
 		get_crt_node_high
 	else
 		get_last_node_high
 		get_crt_node_high
-
-		info_diff_10="当前服务器时间: $crt_time
-当前服务器ip地址: $crt_ip
-
-khala 当前node同步高度: $current_khala_node_block
-khala 当前node最新高度: $highest_khala_node_block
-khala 当前node高度相差: $khala_diff_num
-；；
-kusama当前node同步高度: $current_kusama_node_block
-kusama当前node最新高度: $highest_kusama_node_block
-kusama当前node高度相差: $kusama_diff_num
-；；
-由于某个高度差超过10块，完成一次node服务重启
-"
 
 		info_same_high="当前服务器时间: $crt_time
 当前服务器ip地址: $crt_ip
@@ -94,7 +78,6 @@ kusama当前node高度相差: $kusama_diff_num
 		fi
 	fi
 }
-
 
 
 monitor_node_high
