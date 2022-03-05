@@ -1,0 +1,68 @@
+process_names:
+  - name: "{{.Comm}}"
+    cmdline:
+    - '.+'
+
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'prometheus'
+
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'grafana'
+
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'docker'
+
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'nginx'
+
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'keepalived'
+
+  # phala进程 
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'khala-node'
+
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'pruntime'
+
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'pherry'
+
+# 自定义监控数据收集进程
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'metrics'
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'metrics2'
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'check_machines'
+
+
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'cadvisor'
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'node_exporter'
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'alertmanager'
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'prometheus-webhook-dingtalk'
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'redis'
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'node'
