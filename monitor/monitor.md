@@ -1,3 +1,6 @@
 # Monitor系统
 
-待完善
+简单点，直接跑吧
+
+- [prometheus](#prometheus)
+  - []

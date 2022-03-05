@@ -80,7 +80,7 @@ No cheap. Let's go.
 
 ### 准备
 #### 系统安装准备工作
-> 系统安装 ——> [系统初始化](init.md) ——> [数据盘LVM配置](lvm.md)
+> 系统安装 ——> [系统初始化](scripts/init/init.md) ——> [数据盘LVM配置](lvm/lvm.md)
 
 **以下脚本位置，均放置在/opt目录下，进行操作演示**
 
@@ -183,7 +183,7 @@ No cheap. Let's go.
 
 
 ## 监控
-本监控，基于prometheus和grafana，进行数据采集和数据展示  
+基于prometheus和grafana，进行数据采集和数据展示  
 请单独参考 [Monitor](monitor/monitor.md)
 
 ### 全网数据监控
