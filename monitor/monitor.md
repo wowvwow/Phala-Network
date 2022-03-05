@@ -17,7 +17,7 @@ workers系统参数监控模板：
 `docker_process.json` 和 `worker_for_node.json`，可以直接导入json文件，也可以从 [workers系统参数监控模板](https://grafana.com/dashboards/8919) 和 [workersDocker监控模板](https://grafana.com/dashboards/8919) 获取
 
 worker_for_node展示效果：  
-[![worker_for_node](https://github.com/wowvwow/Phala-Network/blob/main/png/docker_process.png)]()  
+[![worker_for_node](https://github.com/wowvwow/Phala-Network/blob/main/png/worker_for_node.png)]()  
 
 docker_process展示效果：  
 [![docker_process](https://github.com/wowvwow/Phala-Network/blob/main/png/docker_process.png)]()  
