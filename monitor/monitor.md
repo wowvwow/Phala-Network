@@ -2,7 +2,7 @@
 
 简单点，直接跑吧
 
-## 运行 Prometheus
+## 运行 Prometheus 和 Grana
 1. 修改`dingding.yml`文件中的 [access_token](https://open.dingtalk.com/document/robots/custom-robot-access) 用来接受`prometheus`的监控信息告警
 2. 修改`albert-rules.yml`文件中的`ip`地址，对应你的`监控实例`地址
 3. 修改`prometheus.yml`文件， 
