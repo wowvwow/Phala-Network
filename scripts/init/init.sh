@@ -42,15 +42,16 @@ fi
 
 update_system(){
     apt update 
+    apt install -y net-tools git vim unzip zip lrzsz glances docker docker.io docker-compose expect dkms jq
 
     dkms remove sgx/1.41 --all
     rm -rf /var/lib/dpkg/lock*
     rm -rf /var/cache/apt/archives/lock
     dpkg --configure -a
     # 更新系统，可以跳过这一步 
+    # apt dist-upgrade
     # apt dist-upgrade --fix-missing -y
 
-    apt install -y net-tools git vim unzip zip lrzsz glances docker docker.io docker-compose expect dkms jq
     # 开启子菜单选项，配置默认内核选项
     if cat /etc/issue | grep "18." &>/dev/null ; then
         apt install -y linux-headers-5.4.0-84-generic linux-image-5.4.0-84-generic linux-hwe-5.4-tools-5.4.0-84 linux-modules-5.4.0-84-generic linux-modules-extra-5.4.0-84-generic
