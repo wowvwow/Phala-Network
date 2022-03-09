@@ -641,14 +641,6 @@ update_docker_conf(){
     cp -rf /etc/docker/daemon.json /etc/docker/daemon.json.bak
     cat >/etc/docker/daemon.json <<EOF
 {
-    // "registry-mirrors": [
-    //     "https://kfwkfulq.mirror.aliyuncs.com",
-    //     "https://2lqq34jg.mirror.aliyuncs.com",
-    //     "https://pee6w651.mirror.aliyuncs.com",
-    //     "https://registry.docker-cn.com",
-    //     "http://hub-mirror.c.163.com",
-    //     "https://eiqg0bg0.mirror.aliyuncs.com"
-    // ],
     "registry-mirrors": [],
 
     "dns": ["114.114.114.114","8.8.8.8","8.8.4.4"],
