@@ -8,7 +8,7 @@
 - [全新部署](#全新部署)
   - [单机部署](#单机部署)
   - [分离部署](#分离部署)
-- [从prb V0迁移到V2](#从prb V0迁移到V2)
+- [prbV0迁移到V2](#prbV0迁移到V2)
 - [批量添加pools和workers](#批量添加pools和workers)
 
 
@@ -274,7 +274,7 @@ Ok, enjoy it like a girl!
 > 参考 [docker-compose.prb.sample.yml](./docker-compose.prb.sample.yml) 文件，启动`lifecycle`和其他剩余组件
 
 
-## 从prb_V0迁移到V2
+## 从prbV0迁移到V2
 稍后补充
 
 
