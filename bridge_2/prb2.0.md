@@ -21,7 +21,7 @@
 > 该架构，采用`data_provider`与其他`lifecycle`组件分离的模式，当然也可以将两种合并在同一台机器上，用户可以选择灵活的部署方式，仅供参考  
 > 官方采用了libp2p来各个组件的相互发现，在部署了多台`data_providers`后，进入`monitor`页面，会有所有的发现列表，这样用户可以修改`docker-compose`中对应的`lifecycle`的`PHALA_WALKIE_BOOT_NODES`字段值，可以填写多个`data_providers`的`peerId`，来实现多个`phala-node`与`data_providers`的高可用性，来支援多个PRB节点(即lifecycle及其相关组件)
 
-[![phala-network](bridge_2/png/prb20.png)]()
+[![phala-network](./png/prb20.png)]()
 
 
 ## 全新部署
@@ -261,7 +261,7 @@ docker ps -a
 使用浏览器访问monitor地址
 > http://127.0.0.1:3000 或 `http://对应的机器IP:3000`
 
-[![monitor](bridge_2/png/monitor_discover.png)]()
+[![monitor](./png/monitor_discover.png)]()
 
 Ok, enjoy it like a girl!
 
