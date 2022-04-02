@@ -1,0 +1,72 @@
+# version: "3"
+version: "2"
+
+x-defaults: &defaults
+  volumes: &default-volume-config
+    - ./data:/var/data
+
+services:
+  data_provider:
+          # image: phalanetwork/prb:git-next
+    image: phalanetwork/prb:next
+    hostname: data_provider
+    network_mode: host
+    restart: always
+    volumes: *default-volume-config
+    logging:
+      options:
+        # max-size: "1g"
+        max-size: "500m"
+    environment:
+      # 要启动的模块
+      - PHALA_MODULE=data_provider
+      # 应用程序环境，设置为开发以将应用置于开发模式
+      - NODE_ENV=development
+      # 记录日志级别
+      - PHALA_LOGGER_LEVEL=debug
+
+      # WebSocket端点到中继链的Substrate RPC(例如，对于Khala来说，它是Kusama)
+      - PHALA_PARENT_CHAIN_ENDPOINT=ws://127.0.0.1:9945
+      # 指向副链的 Substrate RPC 的 WebSocket 端点。
+      - PHALA_CHAIN_ENDPOINT=ws://127.0.0.1:9944
+
+      # libp2p 的侦听地址的多地址（https://github.com/libp2p/specs/tree/master/addressing）
+      # 默认为'/ip4/0.0.0.0/tcp/0，/ip6/：：/tcp/0'，这意味着在每个接口上侦听一个随机端口。
+      # 仅支持 TCP 协议。在地址之间使用逗号。
+      - PHALA_WALKIE_LISTEN_ADDRESSES=/ip4/0.0.0.0/tcp/28888,/ip6/::/tcp/28889
+
+      # 用于对等发现的引导节点的多添加列表默认为"/ip4/0.0.0.0/tcp/18888，/ip6/：：/tcp/28889"，这意味着没有引导节点。
+      # 仅支持 TCP 协议。在地址之间使用逗号。
+      # - PHALA_WALKIE_BOOT_NODES=
+      
+      # 要和 PRB 的 lifecycle 的相同环境变量保持一致
+      - PHALA_BRIDGE_IDENTITY=staging
+
+      # BLOB服务session使用的最大内存为64G?
+      - PHALA_LIFECYCLE_BLOB_SERVER_SESSION_MAX_MEMORY=64
+
+      # 存储标识密钥的路径默认为"/var/data/keys/id"
+      # - PHALA_PEER_ID_PREFIX=/var/data/keys/id
+      
+    entrypoint:
+      - "node"
+      - "--trace-warnings"
+      - "--experimental-json-modules"
+      - "--es-module-specifier-resolution=node"
+      - "--harmony-top-level-await"
+      # - "--trace-gc"
+      # - "--expose-gc"
+      # - "--no-compilation-cache"
+      # - "--max-old-space-size=10240"
+      # - "--max-heap-size=100"
+      # - "--no-always-promote-young-mc"
+      - "dist/index"
+
+  monitor:
+    image: phalanetwork/prb-monitor:next
+    hostname: monitor
+    network_mode: host
+    environment:
+      - NS_FETCH=fetch
+      - NEXT_PUBLIC_NS_LIST=default
+      - PTP_BOOT_NODES=/ip4/127.0.0.1/tcp/28888
