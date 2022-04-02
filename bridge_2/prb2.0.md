@@ -274,7 +274,7 @@ Ok, enjoy it like a girl!
 > 参考 [docker-compose.prb.sample.yml](./docker-compose.prb.sample.yml) 文件，启动`lifecycle`和其他剩余组件
 
 
-## 从prbV0迁移到V2
+## prbV0迁移到V2
 稍后补充
 
 
