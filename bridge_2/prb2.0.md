@@ -275,7 +275,8 @@ Ok, enjoy it like a girl!
 
 
 ## prbV0迁移到V2
-稍后补充
+> [参考官方文档](https://github.com/Phala-Network/runtime-bridge/wiki/Migrate-from-v0-to-v2)  
+稍后补充详细操作
 
 
 ## 批量添加pools和workers
