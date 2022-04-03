@@ -25,7 +25,7 @@
 
 
 ## 全新部署
-> `docker-compose`文件源自 `phala-newwork`官方成员 [将军](https://github.com/jasl) ，供大家参考
+> `docker-compose`文件源自 [Phala-Network](https://github.com/Phala-Network) 官方成员 [将军](https://github.com/jasl) ，供大家参考
 
 ### 单机部署
 > 单机部署全组件，使用`docker-compose.yml`文件，配置文件如下：
