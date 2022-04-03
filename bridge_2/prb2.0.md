@@ -282,7 +282,7 @@ Ok, enjoy it like a girl!
 ## 批量添加pools和workers
 > 目前只支持单机批量添加
 
-[add_worker_to_prb_pro_2](scripts/for_add_pools_and_workers_20/add_worker_to_prb_pro_2.0.py) 脚本  
+[add_worker_to_prb_pro_2](/scripts/for_add_pools_and_workers_20/add_worker_to_prb_pro_2.0.py) 脚本  
 ```python3
     # '''示例代码'''
     # worker_ips.txt文件，放置要添加到同一个prb的worker对应的ip地址，一行一个
