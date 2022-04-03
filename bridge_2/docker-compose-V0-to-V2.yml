@@ -1,41 +1,10 @@
-# PRB2.0
-
-
-## 内容列表
-
-- [组件介绍](#组件介绍)
-- [基本架构](#基本架构)
-- [全新部署](#全新部署)
-  - [单机部署](#单机部署)
-  - [分离部署](#分离部署)
-- [prbV0迁移到V2](#prbV0迁移到V2)
-- [批量添加pools和workers](#批量添加pools和workers)
-
-
-
-## 组件介绍
-> [参考官方文档](https://github.com/Phala-Network/runtime-bridge/wiki/Deployment-Guide-for-Runtime-Bridge-2)
-
-
-## 基本架构
-> 该架构，采用`data_provider`与其他`lifecycle`组件分离的模式，当然也可以将两种合并在同一台机器上，用户可以选择灵活的部署方式，仅供参考  
-> 官方采用了libp2p来各个组件的相互发现，在部署了多台`data_providers`后，进入`monitor`页面，会有所有的发现列表，这样用户可以修改`docker-compose`中对应的`lifecycle`的`PHALA_WALKIE_BOOT_NODES`字段值，可以填写多个`data_providers`的`peerId`，来实现多个`phala-node`与`data_providers`的高可用性，来支援多个PRB节点(即lifecycle及其相关组件)
-
-[![phala-network](./png/prb20.png)]()
-
-
-## 全新部署
-> `docker-compose`文件源自 `phala-newwork`官方成员 [将军](https://github.com/jasl) ，供大家参考
-
-### 单机部署
-> 单机部署全组件，使用`docker-compose.yml`文件，配置文件如下：
-```yaml
 # version: "3"
 version: "2"
 
 x-defaults: &defaults
   volumes: &default-volume-config
-    - ./data:/var/data
+    - /opt/prb10旧数据目录/data:/var/data_old
+    - /opt/prb20新数据存放目录(新建)/data_1:/var/data
 
 services:
   data_provider:
@@ -63,10 +32,8 @@ services:
       - PHALA_BRIDGE_IDENTITY=staging
 
       # WebSocket端点到中继链的Substrate RPC(例如，对于Khala来说，它是Kusama)
-      # 配置phala-node节点地址和对应端口
       - PHALA_PARENT_CHAIN_ENDPOINT=ws://127.0.0.1:9945
       # 指向副链的 Substrate RPC 的 WebSocket 端点（这里指向khala）。
-      # 配置phala-node节点地址和对应端口
       - PHALA_CHAIN_ENDPOINT=ws://127.0.0.1:9944
 
       # libp2p 的侦听地址的多地址（https://github.com/libp2p/specs/tree/master/addressing）
@@ -119,15 +86,6 @@ services:
     #   - "3000:3000"
 
 
-###### prb部分 ######
-# # version: "3"
-# version: "2"
-# 
-# x-defaults: &defaults
-#   volumes: &default-volume-config
-#     - ./data:/var/data
-
-# services:
   redis-q:
     network_mode: host
     image: redis:alpine
@@ -243,86 +201,3 @@ services:
       - "dist/index"
     # ports:
     #   - "29888:29888"
-
-```
-
-启动prb2.0所有组件
-```shell
-docker-compose -f bridge_2/docker-compose.yml up d
-
-# 或者
-cd bridge_2
-docker-compose -f docker-compose.yml up -d
-
-# 查看服务运行状态
-docker ps -a
-```
-
-等待`data_provider`同步`phala-node`数据，根据我的测试，该时长花费大约 **1~2** 天，但是占用磁盘用量同比减少 **三分之二**
-
-使用浏览器访问monitor地址
-> http://127.0.0.1:3000 或 `http://对应的机器IP:3000`
-
-[![monitor](./png/monitor_discover.png)]()
-
-Ok, enjoy it like a girl!
-
-### 分离部署
-> data_providers与phala-node同机  
-> 参考 [docker-compose.dp.sample.yml](./docker-compose.dp.sample.yml)文件，启动`data_providers`与`monitor`
-
-
-> lifecycle与其他组件同机  
-> 参考 [docker-compose.prb.sample.yml](./docker-compose.prb.sample.yml) 文件，启动`lifecycle`和其他剩余组件
-
-
-## prbV0迁移到V2
-> [参考官方文档](https://github.com/Phala-Network/runtime-bridge/wiki/Migrate-from-v0-to-v2)  
-
-从旧`prb`数据迁移到`prb2.0`
-1. 停止目前所有的旧prb运行的组件
-2. 修改和核对[docker-compose-V0-to-V2.yml](./docker-compose-V0-to-V2.yml) 文件中的
-```yml
-  volumes: &default-volume-config
-    # /opt/prb10/data为旧prb存放的数据目录，/var/data_old为data_provider容器映射逻辑卷目录不可修改，保持不变
-    # /opt/prb20/data_1为新prb存储的数据目录(需要新建), data_provider服务会将旧prb中的数据，
-    # 迁移和转换到容器目录/var/data(该目录不可修改，保持不变)中，即/opt/prb20/data_1目录，用户可以自行修改
-    - /opt/prb10/data:/var/data_old 
-    - /opt/prb20/data_1:/var/data
-```
-3. 运行数据迁移程序(该数据迁移时长暂未测试，需要用户自行测试时长，应该不会超过1天，可能数个小时)
-```shell
-# 启动并运行服务
-docker-compose -f docker-compose-V0-to-V2.yml up -d
-# 查看运行情况
-docker-compose ps -a 
-# 查看data_provider服务日志
-docker-compose logs -f --tail=100 data_provider
-```
-
-
-## 批量添加pools和workers
-> 目前只支持单机批量添加
-
-[add_worker_to_prb_pro_2](/scripts/for_add_pools_and_workers_20/add_worker_to_prb_pro_2.0.py) 脚本  
-```python3
-    # '''示例代码'''
-    # worker_ips.txt文件，放置要添加到同一个prb的worker对应的ip地址，一行一个
-    # worker_pids_ips.txt文件，放置要添加到同一个prb的worker对应的pid和ip，以 : 分隔，一行一个
-
-    your_pid = 83
-    mnemonic1 = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
-    ip_port1 = '192.168.2.100:3000'
-    add_worker_for_ip(pid=your_pid,
-                      ip_port=ip_port1,
-                      mnemonic=mnemonic1,
-                      txt='./worker_ips.txt')
-
-    mnemonic2 = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
-    ip_port2 = '192.168.3.100:3000'
-    add_worker_for_pid_ip(ip_port=ip_port2,
-                          mnemonic=mnemonic2,
-                          txt='./worker_pids_ips.txt')
-
-    # 其他情况，用户可自行添加
-```
