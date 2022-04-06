@@ -220,18 +220,20 @@ class PrbDeletePool(PrbPostRequestForDiscover):
 
 
 class AddWorkerAndPoolsToPrb(object):
-    def __init__(self, ip_port, n=0):
-        self.n = n
+    def __init__(self, ip_port, prb_ip_port='127.0.0.1'):
         self.ip_port = ip_port
+        self.prb_ip_port = prb_ip_port
+        self.pools_list = ''
+        self.workers_list = ''
 
     def add_pools_to_prb(self, pools_list):
-        req = PrbCreatPool(self.ip_port, self.n)
+        req = PrbCreatPool(ip_port=self.ip_port, pools_list=self.pools_list, prb_ip_port=self.prb_ip_port)
         result = req.get_resp_data({"pools": pools_list})
         print(result)
         return result
 
     def add_workers_to_prb(self, workers_list):
-        req = PrbCreatWorker(self.ip_port, self.n)
+        req = PrbCreatWorker(ip_port=self.ip_port, workers_list=self.workers_list, prb_ip_port=self.prb_ip_port)
         result = req.get_resp_data({"workers": workers_list})
         print(result)
         return result
