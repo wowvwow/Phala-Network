@@ -259,6 +259,15 @@ docker ps -a
 ```
 
 等待`data_provider`同步`phala-node`数据，根据我的测试，该时长花费大约 **1~2** 天，但是占用磁盘用量同比减少 **三分之二**
+>prb20的目录结构：  
+0  
+keys  
+local.db  
+
+>0 就是同步的node块数据  
+>keys 目录是libp2p发现服务，保存的peerid等  
+>local.db 文件保存的加入的pools数据和worker数据
+
 
 使用浏览器访问monitor地址
 > http://127.0.0.1:3000 或 `http://对应的机器IP:3000`
