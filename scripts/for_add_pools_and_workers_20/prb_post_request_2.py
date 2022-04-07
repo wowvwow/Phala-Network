@@ -36,9 +36,12 @@ class PrbPostRequestForDiscover(object):
             self.resp = requests.post(self.url, headers=self.headers, timeout=120)
             self.resp_data = self.resp.json()
             self.resp.close()
+            # print(self.resp_data)
 
             self.data_providers = self.resp_data['dataProviders']
             self.lifecycleManagers = self.resp_data['lifecycleManagers']
+            # print(self.data_providers)
+            # print(self.lifecycleManagers)
 
         except Exception as post_err:
             print('Failed: ', post_err)
@@ -48,6 +51,7 @@ class PrbPostRequestForDiscover(object):
             self.data_provider_ips_peerid[data_provider['remoteAddr'].split('/')[2]] \
                 = data_provider['peerId']
 
+        # print(self.data_provider_ips_peerid)
         return self.data_provider_ips_peerid
 
     def get_lifecycle_managers_peer_id(self):
@@ -55,6 +59,7 @@ class PrbPostRequestForDiscover(object):
             self.lifecycle_manager_ips_peerid[lifecycle_manager['remoteAddr'].split('/')[2]] = \
                 lifecycle_manager['peerId']
 
+        # print(self.lifecycle_manager_ips_peerid)
         return self.lifecycle_manager_ips_peerid
 
     def get_resp_data(self, post_data):
@@ -69,6 +74,7 @@ class PrbPostRequestForDiscover(object):
             resp = requests.post(url=self.url, data=post_data, headers=self.headers, timeout=120)
             resp_data = resp.json()
             resp.close()
+            # print(resp_data)
 
             return resp_data
         except Exception as post_err:
@@ -79,9 +85,25 @@ class PrbGetDpStatus(PrbPostRequestForDiscover):
     """
     Get Data Provider Info
     """
-    def __init__(self, ip_port, prb_ip_port='127.0.0.1'):
+    def __init__(self, ip_port, dp_ip_port='127.0.0.1'):
         super().__init__(ip_port)
-        self.data_provider_peer_id = self.get_data_provider_peer_id()[prb_ip_port]
+        # peer_id_list = self.get_data_provider_peer_id()
+        # peer_id_list = ['QmNcy5xSvjVXgd8wb9aKdDC2KBe1EgncG6enzSS1kjC67K',
+        #                 'QmNcy5xSvjVXgd8wb9aKdDC2KBe1EgncG6enzSS1kjC67K',
+        #                 'QmNcy5xSvjVXgd8wb9aKdDC2KBe1EgncG6enzSS1kjC67K']
+        # if len(peer_id_list) == 1:
+        #     self.n = 0
+        # else:
+        #     k = 0
+        #     while k < len(peer_id_list):
+        #         print(f"[{k}]: {peer_id_list[k]}")
+        #         k += 1
+
+        #     self.n = input(f"请选择要获取的data_provider_peer_id: ")
+        #     print(f"you choice peer id of data_provider is: [{peer_id_list[int(self.n)]}]")
+        #     input('请按回车键，选择继续')
+
+        self.data_provider_peer_id = self.get_data_provider_peer_id()[dp_ip_port]
         self.url = f'http://{ip_port}/ptp/proxy/{self.data_provider_peer_id}/GetDataProviderInfo'
         self.referer = f'http://{ip_port}/dp/status/{self.data_provider_peer_id}'
         self.result = super().get_resp_data('')
@@ -108,7 +130,7 @@ class PrbRestartWorkers(PrbPostRequestForDiscover):
         self.lifecycleManager_peer_id = self.get_lifecycle_managers_peer_id()[prb_ip_port]
         self.url = f'http://{ip_port}/ptp/proxy/{self.lifecycleManager_peer_id}/RestartWorker'
         self.referer = f'http://{ip_port}/lifecycle/status/{self.lifecycleManager_peer_id}'
-        self.result = super().get_resp_data({"ids": workers_list})
+        # self.result = super().get_resp_data({"ids": workers_list})
 
 
 class PrbKickWorkers(PrbPostRequestForDiscover):
@@ -120,7 +142,7 @@ class PrbKickWorkers(PrbPostRequestForDiscover):
         self.lifecycleManager_peer_id = self.get_lifecycle_managers_peer_id()[prb_ip_port]
         self.url = f'http://{ip_port}/ptp/proxy/{self.lifecycleManager_peer_id}/KickWorker'
         self.referer = f'http://{ip_port}/lifecycle/status/{self.lifecycleManager_peer_id}'
-        self.result = super().get_resp_data({"ids": workers_list})
+        # self.result = super().get_resp_data({"ids": workers_list})
 
 
 class PrbRefreshRaAndRestartWorkers(PrbPostRequestForDiscover):
@@ -132,7 +154,7 @@ class PrbRefreshRaAndRestartWorkers(PrbPostRequestForDiscover):
         self.lifecycleManager_peer_id = self.get_lifecycle_managers_peer_id()[prb_ip_port]
         self.url = f'http://{ip_port}/ptp/proxy/{self.lifecycleManager_peer_id}/RefreshRaAndRestartWorker'
         self.referer = f'http://{ip_port}/lifecycle/status/{self.lifecycleManager_peer_id}'
-        self.result = super().get_resp_data({"ids": workers_list})
+        # self.result = super().get_resp_data({"ids": workers_list})
 
 
 class PrbGetListPool(PrbPostRequestForDiscover):
@@ -207,18 +229,6 @@ class PrbUpdatePool(PrbPostRequestForDiscover):
         # self.result = super().get_resp_data({"items": pools_list})
 
 
-class PrbDeletePool(PrbPostRequestForDiscover):
-    """
-    Delete Pools
-    """
-    def __init__(self, ip_port, pools_list, prb_ip_port='127.0.0.1'):
-        super().__init__(ip_port)
-        self.lifecyclemanager_peer_id = self.get_lifecycle_managers_peer_id()[prb_ip_port]
-        self.url = f'http://{ip_port}/ptp/proxy/{self.lifecyclemanager_peer_id}/UpdatePool'
-        self.referer = f'http://{ip_port}/lifecycle/pools/{self.lifecyclemanager_peer_id}'
-        # self.result = super().get_resp_data({"items": pools_list})
-
-
 class AddWorkerAndPoolsToPrb(object):
     def __init__(self, ip_port, prb_ip_port='127.0.0.1'):
         self.ip_port = ip_port
@@ -232,9 +242,53 @@ class AddWorkerAndPoolsToPrb(object):
         print(result)
         return result
 
+    def update_or_delete_pools_to_prb(self, pools_list):
+        req = PrbUpdatePool(ip_port=self.ip_port, pools_list=self.pools_list, prb_ip_port=self.prb_ip_port)
+        result = req.get_resp_data({"pools": pools_list})
+        print(result)
+        return result
+
     def add_workers_to_prb(self, workers_list):
         req = PrbCreatWorker(ip_port=self.ip_port, workers_list=self.workers_list, prb_ip_port=self.prb_ip_port)
         result = req.get_resp_data({"workers": workers_list})
+        print(result)
+        return result
+
+    def update_or_delete_workers_to_prb(self, workers_list):
+        req = PrbUpdateWorker(ip_port=self.ip_port, workers_list=self.workers_list, prb_ip_port=self.prb_ip_port)
+        result = req.get_resp_data({"workers": workers_list})
+        print(result)
+        return result
+
+    def restart_worker(self, workers_list):
+        """
+        restart worker
+        """
+        req = PrbRestartWorkers(ip_port=self.ip_port, workers_list=self.workers_list, prb_ip_port=self.prb_ip_port)
+        result = req.get_resp_data({'ids': workers_list})
+        print(result)
+        return result
+
+    def kill_worker(self, workers_list):
+        """
+        kill worker
+        """
+        req = PrbKickWorkers(ip_port=self.ip_port, workers_list=self.workers_list, prb_ip_port=self.prb_ip_port)
+        result = req.get_resp_data({'ids': workers_list})
+        print(result)
+        return result
+
+    def refresh_ra_and_restart_worker(self, workers_list):
+        """
+        restart and re-register worker
+        多用于worker中 "syncOnly": True 的机器(只同步的机器)
+        :param workers_list:
+        :return:
+        """
+        req = PrbRefreshRaAndRestartWorkers(ip_port=self.ip_port,
+                                            workers_list=self.workers_list,
+                                            prb_ip_port=self.prb_ip_port)
+        result = req.get_resp_data({'ids': workers_list})
         print(result)
         return result
 
@@ -244,33 +298,37 @@ if __name__ == '__main__':
 
     """示例代码"""
     # # 获取dp_status
-    # dp_status = PrbGetDpStatus('192.168.2.239:3000').result
+    # dp_status = PrbGetDpStatus(ip_port='192.168.2.239:3000', dp_ip_port='127.0.0.1').result
+    # # dp_status = PrbGetDpStatus(ip_port='192.168.2.239:3000', dp_ip_port='192.168.2.9').result
     # print(dp_status)
 
     # # 获取pools_list
-    # pools_list = PrbGetListPool('192.168.2.239:3000').result
+    # # pools_list = PrbGetListPool(ip_port='192.168.2.239:3000', prb_ip_port='127.0.0.1').result
+    # pools_list = PrbGetListPool(ip_port='192.168.2.239:3000', prb_ip_port='192.168.2.9').result
     # print(pools_list)
 
     # # 获取workers_list
-    # workers_list = PrbGetListWorker('192.168.2.239:3000').result
+    # # workers_list = PrbGetListWorker(ip_port='192.168.2.239:3000', prb_ip_port='127.0.0.1').result
+    # workers_list = PrbGetListWorker(ip_port='192.168.2.239:3000', prb_ip_port='192.168.2.9').result
     # print(workers_list)
 
     # # 获取worker_status
-    # worker_status = PrbGetWorkersStatus('192.168.2.239:3000').result
+    # # worker_status = PrbGetWorkersStatus(ip_port='192.168.2.239:3000', prb_ip_port='127.0.0.1').result
+    # worker_status = PrbGetWorkersStatus(ip_port='192.168.2.239:3000', prb_ip_port='192.168.2.9').result
     # print(worker_status)
 
     # # 创建pools
-    # ip_port = '192.168.5.239:3000'
+    # ip_port = '192.168.2.239:3000'
     # mnemonic_staker = ''
     # pools = [{"name": "1903",
     #           "pid": "1903",
     #           "enabled": True,
     #           "syncOnly": False,
-    #           "realPhalaSs58":"",
+    #           "realPhalaSs58": "",
     #           "owner": {"mnemonic": f"{mnemonic_staker}"}}
     #          ]
-    # a = PrbCreatPool(ip_port, pools).result
-    # print(a)
+    # a = AddWorkerAndPoolsToPrb(ip_port=ip_port, prb_ip_port='192.168.2.9')
+    # a.add_pools_to_prb(pools)
 
     # # # 更新pools
     # ip_port = '192.168.2.239:3000'
@@ -286,8 +344,8 @@ if __name__ == '__main__':
     #         }
     #     },
     # ]
-    # a = PrbUpdatePool(ip_port, pools).result
-    # print(a)
+    # a = AddWorkerAndPoolsToPrb(ip_port=ip_port, prb_ip_port='127.0.0.1')
+    # a.update_or_delete_pools_to_prb(pools)
 
     # # # 删除pools
     # ip_port = '192.168.2.239:3000'
@@ -297,19 +355,23 @@ if __name__ == '__main__':
     #         "pool": {"deleted": True}
     #      },
     # ]
-    # a = PrbUpdatePool(ip_port, pools).result
-    # print(a)
+    # a = AddWorkerAndPoolsToPrb(ip_port=ip_port, prb_ip_port='127.0.0.1')
+    # a.update_or_delete_pools_to_prb(pools)
 
     # # 创建workers
     # ip_port = '192.168.2.239:3000'
-    # workers = [{"enabled": True,
-    #             "syncOnly": False,
-    #             "pid": "1931",
-    #             "name": "192.168.1.1",
-    #             "endpoint": "http://192.168.1.1:8000",
-    #             "stake": "10000000000000"}]
-    # a = PrbCreatWorker(ip_port, workers_list=workers).result
-    # print(a)
+    # workers = [
+    #     {
+    #         "enabled": True,
+    #         "syncOnly": False,
+    #         "pid": "1931",
+    #         "name": "192.168.1.1",
+    #         "endpoint": "http://192.168.1.1:8000",
+    #         "stake": "10000000000000"
+    #     }
+    # ]
+    # a = AddWorkerAndPoolsToPrb(ip_port=ip_port, prb_ip_port='127.0.0.1')
+    # a.add_workers_to_prb(workers)
 
     # # 更新workers
     # ip_port = '192.168.2.239:3000'
@@ -318,7 +380,7 @@ if __name__ == '__main__':
     #         "id": {"uuid": "xxxx-xxxx-xxxx-xxxxxxxxxx"},
     #         "worker": {
     #             "pid": 1931,
-    #             "name": "192.168.1.1111",
+    #             "name": "192.168.1.111",
     #             "endpoint": "http://192.168.1.111:8000",
     #             "stake": "10000000000000",
     #             "enabled": True,
@@ -326,16 +388,17 @@ if __name__ == '__main__':
     #         }
     #     }
     # ]
-    # a = PrbUpdateWorker(ip_port, workers_list=workers).result
-    # print(a)
+    # a = AddWorkerAndPoolsToPrb(ip_port=ip_port, prb_ip_port='127.0.0.1')
+    # a.update_or_delete_workers_to_prb(workers)
 
     # # 删除workers
     # ip_port = '192.168.2.239:3000'
     # workers = [
     #     {
-    #         "id": {"uuid": "6fd18158-7957-442f-8385-0618a08e3404"}, "worker": {"deleted": True}
+    #         "id": {"uuid": "6fd18158-7957-442f-8385-0618a08e3404"},
+    #         "worker": {"deleted": True}
     #     }
     # ]
-    # a = PrbUpdateWorker(ip_port, workers).result
-    # print(a)
+    # a = AddWorkerAndPoolsToPrb(ip_port=ip_port, prb_ip_port='127.0.0.1')
+    # a.update_or_delete_workers_to_prb(workers)
 

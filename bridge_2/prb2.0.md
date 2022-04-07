@@ -311,25 +311,60 @@ docker-compose logs -f --tail=100 data_provider
 
 
 ## 批量添加pools和workers
-> 目前只支持单机批量添加
+> 支持prb20，对应多个prb时，指定某个prb添加workers和pools，默认为127.0.0.1
 
 [add_worker_to_prb_pro_2](/scripts/for_add_pools_and_workers_20/add_worker_to_prb_pro_2.0.py) 脚本  
 ```python3
-    # '''示例代码'''
+def add_worker_for_ip(txt, pid, mnemonic, ip_port='192.168.2.100:3000', prb_ip_port='192.168.2.9'):
+    """
+    执行要添加到同一个prb的worker，并且该文件下的worker属于同一个pid
+    :param txt: 添加workers的文件
+    :param pid: 你要添加的worker对应的pid号
+    :param mnemonic: 助记词
+    :param ip_port: prb-monitor的ip和端口
+    :param prb_ip_port: Lifecycle Managers对应的 "remoteAddr" 中对用的prb的ip
+    :return:
+    """
+    a = AddWorker(mnemonic=mnemonic, ip_port=ip_port, prb_ip_port=prb_ip_port)
+    a.add_pools(pid, mnemonic)
+    a.add_workers(txt, pid)
+
+
+def add_worker_for_pid_ip(txt, mnemonic, ip_port='192.168.3.100:3000', prb_ip_port='127.0.0.1'):
+    """
+    执行要添加到同一个prb的worker，并且该文件下的worker对应不同的pid，而这些pid使用同一个Gas账户，即同一个助记词
+    :param txt: 添加workers的文件，格式：pid:worker_ip, 如 88:192.168.2.1 , 一行一个
+    :param mnemonic: 助记词
+    :param ip_port: prb-monitor的ip和端口
+    :param prb_ip_port: Lifecycle Managers对应的 "remoteAddr" 中对用的prb的ip
+    :return:
+    """
+    a = AddWorker(mnemonic=mnemonic, ip_port=ip_port, prb_ip_port=prb_ip_port)
+    a.add_workers_for_each(txt, mnemonic)
+
+
+if __name__ == '__main__':
+    pass
+
+    '''示例代码'''
     # worker_ips.txt文件，放置要添加到同一个prb的worker对应的ip地址，一行一个
     # worker_pids_ips.txt文件，放置要添加到同一个prb的worker对应的pid和ip，以 : 分隔，一行一个
 
     your_pid = 83
     mnemonic1 = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
     ip_port1 = '192.168.2.100:3000'
+    prb_ip_port1 = '127.0.0.1'
     add_worker_for_ip(pid=your_pid,
                       ip_port=ip_port1,
+                      prb_ip_port=prb_ip_port1,
                       mnemonic=mnemonic1,
                       txt='./worker_ips.txt')
 
     mnemonic2 = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
     ip_port2 = '192.168.3.100:3000'
+    prb_ip_port2 = '127.0.0.1'
     add_worker_for_pid_ip(ip_port=ip_port2,
+                          prb_ip_port=prb_ip_port2,
                           mnemonic=mnemonic2,
                           txt='./worker_pids_ips.txt')
 
