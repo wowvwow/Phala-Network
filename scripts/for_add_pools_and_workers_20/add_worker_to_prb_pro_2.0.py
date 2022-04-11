@@ -8,7 +8,7 @@ import mem as mem
 from eth_account.hdaccount import mnemonic
 
 sys.path.append('..')
-from prb_data.prb_post_request_2 import AddWorkerAndPoolsToPrb
+from prb_post_request_2 import AddWorkerAndPoolsToPrb
 
 
 class AddWorker(object):
@@ -106,9 +106,9 @@ if __name__ == '__main__':
     pass
 
     '''示例代码'''
-    # worker_ips.txt文件，放置要添加到同一个prb的worker对应的ip地址，一行一个
-    # worker_pids_ips.txt文件，放置要添加到同一个prb的worker对应的pid和ip，以 : 分隔，一行一个
 
+    # 法一：
+    # worker_ips.txt文件，放置要添加到同一个prb的worker对应的ip地址，一行一个
     your_pid = 83
     mnemonic1 = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
     ip_port1 = '192.168.2.100:3000'
@@ -118,7 +118,8 @@ if __name__ == '__main__':
                       prb_ip_port=prb_ip_port1,
                       mnemonic=mnemonic1,
                       txt='./worker_ips.txt')
-
+    # 法二：
+    # worker_pids_ips.txt文件，放置要添加到同一个prb的worker对应的pid和ip，以 : 分隔，一行一个
     mnemonic2 = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
     ip_port2 = '192.168.3.100:3000'
     prb_ip_port2 = '127.0.0.1'
