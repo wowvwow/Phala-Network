@@ -311,7 +311,7 @@ docker-compose logs -f --tail=100 data_provider
 
 
 ## 批量添加pools和workers
-> 支持prb20，对应多个`lifecycle`时，指定某个prb添加workers和pools，默认为127.0.0.1
+> 支持prb20，对应多个`lifecycle`时，指定某个`lifecycle`添加workers和pools，默认为127.0.0.1
 
 [add_worker_to_prb_pro_2](/scripts/for_add_pools_and_workers_20/add_worker_to_prb_pro_2.0.py) 脚本  
 ```python3
