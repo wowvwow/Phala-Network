@@ -260,13 +260,20 @@ class AddWorkerAndPoolsToPrb(object):
         print(result)
         return result
 
+
+class MethodForWorkers(AddWorkerAndPoolsToPrb):
+    def __init__(self, ip_port, prb_ip_port='127.0.0.1'):
+        self.ip_port = ip_port
+        self.prb_ip_port = prb_ip_port
+        super(MethodForWorkers, self).__init__(ip_port=self.ip_port, prb_ip_port=self.prb_ip_port)
+
     def restart_worker(self, workers_list):
         """
         restart worker
         """
         req = PrbRestartWorkers(ip_port=self.ip_port, workers_list=self.workers_list, prb_ip_port=self.prb_ip_port)
         result = req.get_resp_data({'ids': workers_list})
-        print(result)
+        # print(result)
         return result
 
     def kill_worker(self, workers_list):
@@ -275,7 +282,7 @@ class AddWorkerAndPoolsToPrb(object):
         """
         req = PrbKickWorkers(ip_port=self.ip_port, workers_list=self.workers_list, prb_ip_port=self.prb_ip_port)
         result = req.get_resp_data({'ids': workers_list})
-        print(result)
+        # print(result)
         return result
 
     def refresh_ra_and_restart_worker(self, workers_list):
@@ -289,7 +296,7 @@ class AddWorkerAndPoolsToPrb(object):
                                             workers_list=self.workers_list,
                                             prb_ip_port=self.prb_ip_port)
         result = req.get_resp_data({'ids': workers_list})
-        print(result)
+        # print(result)
         return result
 
 
@@ -302,9 +309,9 @@ if __name__ == '__main__':
     # # dp_status = PrbGetDpStatus(ip_port='192.168.2.239:3000', dp_ip_port='192.168.2.9').result
     # print(dp_status)
 
-    # # 获取pools_list
-    # # pools_list = PrbGetListPool(ip_port='192.168.2.239:3000', prb_ip_port='127.0.0.1').result
-    # pools_list = PrbGetListPool(ip_port='192.168.2.239:3000', prb_ip_port='192.168.2.9').result
+    # 获取pools_list
+    # pools_list = PrbGetListPool(ip_port='192.168.2.239:3000', prb_ip_port='127.0.0.1').result
+    # pools_list = PrbGetListPool(ip_port='192.168.2.239:3000', prb_ip_port='192.168.2.239').result
     # print(pools_list)
 
     # # 获取workers_list
@@ -312,9 +319,9 @@ if __name__ == '__main__':
     # workers_list = PrbGetListWorker(ip_port='192.168.2.239:3000', prb_ip_port='192.168.2.9').result
     # print(workers_list)
 
-    # # 获取worker_status
-    # # worker_status = PrbGetWorkersStatus(ip_port='192.168.2.239:3000', prb_ip_port='127.0.0.1').result
-    # worker_status = PrbGetWorkersStatus(ip_port='192.168.2.239:3000', prb_ip_port='192.168.2.9').result
+    # 获取worker_status
+    # worker_status = PrbGetWorkersStatus(ip_port='192.168.2.239:3000', prb_ip_port='127.0.0.1').result
+    # worker_status = PrbGetWorkersStatus(ip_port='192.168.2.239:3000', prb_ip_port='192.168.2.239').result
     # print(worker_status)
 
     # # 创建pools

@@ -46,11 +46,12 @@ class AddWorker(object):
         for line in open(single_prbs_txt, 'r'):
             line = line.replace('\n', '')
             pid = line.split(':')[0]
-            name = line.split(':')[1]
+            ip = line.split(':')[1]
+            name = line.split(':')[2]
             workers_list.append({"enabled": True,
                                  "pid": f"{pid}",
                                  "name": f"{name}",
-                                 "endpoint": f"http://{name}:8000",
+                                 "endpoint": f"http://{ip}:8000",
                                  "stake": '10000000000000'})
 
             self.add_pools(pid=pid, mnemonic=mnemonic)
@@ -91,6 +92,8 @@ if __name__ == '__main__':
     # worker_ips.txt文件，放置要添加到同一个prb的worker对应的ip地址，一行一个
     # worker_pids_ips.txt文件，放置要添加到同一个prb的worker对应的pid和ip，以 : 分隔，一行一个
 
+    """
+    # 法一：
     your_pid = 83
     mnemonic1 = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
     ip_port1 = '192.168.2.100:3000'
@@ -98,11 +101,15 @@ if __name__ == '__main__':
                       ip_port=ip_port1,
                       mnemonic=mnemonic1,
                       txt='./worker_ips.txt')
+    """
 
+    """
+    # 法二：
     mnemonic2 = 'xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx'
     ip_port2 = '192.168.3.100:3000'
     add_worker_for_pid_ip(ip_port=ip_port2,
                           mnemonic=mnemonic2,
                           txt='./worker_pids_ips.txt')
+    """
 
-    # 其他情况，用户可自行添加
+    # 以上方法二选一，即可

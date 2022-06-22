@@ -311,9 +311,9 @@ docker-compose logs -f --tail=100 data_provider
 
 
 ## 批量添加pools和workers
-> 支持prb20，对应多个prb时，指定某个prb添加workers和pools，默认为127.0.0.1
+> 支持prb20，对应多个`lifecycle`时，指定某个`lifecycle`添加workers和pools，默认为127.0.0.1
 
-[add_worker_to_prb_pro_2](/scripts/for_add_pools_and_workers_20/add_worker_to_prb_pro_2.0.py) 脚本  
+- [add_worker_to_prb_pro_2](/scripts/for_add_pools_and_workers_20/add_worker_to_prb_pro_2.0.py) 脚本  
 ```python3
 def add_worker_for_ip(txt, pid, mnemonic, ip_port='192.168.2.100:3000', prb_ip_port='192.168.2.9'):
     """
@@ -366,7 +366,31 @@ if __name__ == '__main__':
     add_worker_for_pid_ip(ip_port=ip_port2,
                           prb_ip_port=prb_ip_port2,
                           mnemonic=mnemonic2,
-                          txt='./worker_pids_ips.txt')
+                          txt='./game.txt')
 
     # 其他情况，用户可自行添加
+```
+
+## 增加打地鼠脚本（兼容prb10和prb20），配合定时任务，每分钟执行一次脚本即可
+- [restart_workers_for_prb10_and_prb20](/scripts/for_prb_monitor/restart_workers_for_prb10_and_prb20.py) 脚本 
+```python3
+# 用户需要修改对应的prb的地址和端口，
+# 其中prb20对应的lifecycle_ip为`prb-monitor页面对应的discover页面中Lifecycle Managers对应的 "remoteAddr" 中对用的prb的ip，默认为127.0.0.1，用户对应修改`
+if __name__ == '__main__':
+    pass
+    prb_list = [
+        # prb10
+        '192.168.1.1:3000',
+        '192.168.2.1:3000',
+        # prb20, monitor_ip_port: lifecycle_ip
+        {'192.168.3.1:3000': '127.0.0.1'},
+        {'192.168.4.1:3000': '192.168.4.1'}
+    ]
+    for prb in prb_list:
+        print(prb)
+        restart_workers_lifecycle(prb)
+```
+配合定时任务运行
+```shell
+* * * * * cd /your_path/for_prb_monitor/; python3 restart_workers_for_prb10_and_prb20.py
 ```

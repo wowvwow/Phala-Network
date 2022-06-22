@@ -160,10 +160,10 @@ No cheap. Let's go.
 
 [prb_post_request](scripts/for_prb_monitor/prb_post_request.py): 该脚本包含 **prb-monitor** 页面对应的数据获取，对应worker的 ``kill`` 、``restart``、``delete``、``edit(update)``等接口，可以根据代码中的示例代码，修改自己对应的 **prb-monitor** 地址和端口，来进行演示，用户可以自行调用或用来作其他的批处理工作
 
-[restart_mis_and_timeout](scripts/for_prb_monitor/restart_mis_and_timeout.py): 打地鼠脚本，该脚本用于 **prb-monitor** 页面中worker出现的 ``BlockNumberMismatch``、``TimeoutError``、 ``Notice: worker unresponsive且Block Height值为-1`` 等异常状态的处理，
+[restart_mis_and_timeout](scripts/for_prb_monitor/restart_workers_for_prb10.py): 打地鼠脚本，该脚本用于 **prb-monitor** 页面中worker出现的 ``BlockNumberMismatch``、``TimeoutError``、 ``Notice: worker unresponsive且Block Height值为-1`` 等异常状态的处理，
 该脚本需要配合定时任务执行
 ```shell
-*/5 * * * * cd /opt/scripts/for_prb_monitor/; python3 restart_mis_and_timeout.py
+*/5 * * * * cd /opt/scripts/for_prb_monitor/; python3 restart_workers_for_prb10.py
 ```
 
 ### 其他维护
@@ -186,6 +186,9 @@ No cheap. Let's go.
 
 
 ## 监控
+目前开放全网APP面板监控地址：https://phala.wowvwow.cc:3000 , 带上https访问 
+
+
 基于prometheus和grafana，进行数据采集和数据展示  
 请单独参考 [Monitor](monitor/monitor.md)
 
