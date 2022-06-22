@@ -186,6 +186,8 @@ No cheap. Let's go.
 
 
 ## 监控
+目前开放全网APP面板监控地址：https://phala.wowvwow.cc:3000
+
 基于prometheus和grafana，进行数据采集和数据展示  
 请单独参考 [Monitor](monitor/monitor.md)
 
