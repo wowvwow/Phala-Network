@@ -1,0 +1,3 @@
+[submodule "solo/solo-mining-scripts"]
+	path = solo/solo-mining-scripts
+	url = git@github.com:Phala-Network/solo-mining-scripts.git
